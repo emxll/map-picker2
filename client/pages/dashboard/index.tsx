@@ -1,9 +1,10 @@
 import { NextPage } from "next"
 import { Button } from "../../components/Button"
+import { client, trpc } from "../../utils/trpc"
 import { ChipIcon, DotsVerticalIcon, FireIcon, MailOpenIcon, UserGroupIcon } from '@heroicons/react/solid'
 import { Dialog } from "../../components/Dialog"
 import { useCallback, useEffect, useState } from "react"
-import { config } from "../../config"
+import { config } from "../../../config"
 import { GameCreationDialog } from "../../components/GameCreationDialog"
 import { CGame } from "../../utils/types"
 
@@ -12,34 +13,34 @@ const Dashboard: NextPage = () => {
 
   let [ games, setGames]  = useState<Array<CGame>>([]);
 
-  // let gamesQuery = trpc.useQuery(['games'], {
-  //   onSuccess(data) {
-  //     setGames( data );
-  //   },
-  //   context: {
-  //     foo: 'bar'
-  //   }
-  // });
+  let gamesQuery = trpc.useQuery(['games'], {
+    onSuccess(data) {
+      setGames( data );
+    },
+    context: {
+      foo: 'bar'
+    }
+  });
 
-  // let startGame = trpc.useMutation('startGame');
-  // let deleteGame = trpc.useMutation('deleteGame');
+  let startGame = trpc.useMutation('startGame');
+  let deleteGame = trpc.useMutation('deleteGame');
 
-  // trpc.useSubscription(['onGamesChange'], {
-  //   onNext(data){
-  //     setGames((games) => games.map((game) => game.id === data.id ? data : game));
-  //   }
-  // });
+  trpc.useSubscription(['onGamesChange'], {
+    onNext(data){
+      setGames((games) => games.map((game) => game.id === data.id ? data : game));
+    }
+  });
 
-  // trpc.useSubscription(['onGamesAdd'], {
-  //   onNext(data){
-  //     setGames((games) => [data, ...games]);
-  //   }
-  // });
-  // trpc.useSubscription(['onGamesDelete'], {
-  //   onNext(data){
-  //     setGames((games) => games.filter(game => game.id !== data));
-  //   }
-  // });
+  trpc.useSubscription(['onGamesAdd'], {
+    onNext(data){
+      setGames((games) => [data, ...games]);
+    }
+  });
+  trpc.useSubscription(['onGamesDelete'], {
+    onNext(data){
+      setGames((games) => games.filter(game => game.id !== data));
+    }
+  });
 
   const [focusedGameIndex, setFocusedGameIndex] = useState(0);
 
@@ -162,11 +163,11 @@ const Dashboard: NextPage = () => {
                 <>
                   <Button 
                     className="w-full mt-2 p-4 border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md"
-                    // onClick={(e) => { 
-                    //   startGame.mutate({
-                    //     gameID: games![focusedGameIndex].id
-                    //   })
-                    // }}
+                    onClick={(e) => { 
+                      startGame.mutate({
+                        gameID: games![focusedGameIndex].id
+                      })
+                    }}
                   >START GAME</Button>
                   <div className="p-1"></div>
                 </>
@@ -175,9 +176,9 @@ const Dashboard: NextPage = () => {
                   className="w-full mt-2 p-4 border-2 border-red-300 bg-red-500 active:bg-red-400 drop-shadow-md"
                   onClick={(e) => {
                     //FIXME: implement confirmation dialog
-                    // deleteGame.mutate({
-                    //   gameID: games![focusedGameIndex].id
-                    // });
+                    deleteGame.mutate({
+                      gameID: games![focusedGameIndex].id
+                    });
                     setGameDialogOpen(false);
                   }}
                 >DELETE</Button>
