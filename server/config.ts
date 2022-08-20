@@ -41,8 +41,7 @@ const config = {
     'Breeze',
     'Fracture',
     'Pearl'
-  ],
-  graphqlUri: 'http://map-picker.local:3002/api/graphql'
+  ]
 }
 
 export { config }

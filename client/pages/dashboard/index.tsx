@@ -6,46 +6,48 @@ import { useCallback, useEffect, useState } from "react"
 import { config } from "../../config"
 import { GameCreationDialog } from "../../components/GameCreationDialog"
 import { CGame } from "../../utils/types"
+import client from "../../apollo-client"
+import { gql } from "@apollo/client"
+import { useRouter } from "next/router"
 
+export default () => {
 
-const Dashboard: NextPage = () => {
+  const router = useRouter();
 
-  let [ games, setGames]  = useState<Array<CGame>>([]);
-
-  // let gamesQuery = trpc.useQuery(['games'], {
-  //   onSuccess(data) {
-  //     setGames( data );
-  //   },
-  //   context: {
-  //     foo: 'bar'
-  //   }
-  // });
-
-  // let startGame = trpc.useMutation('startGame');
-  // let deleteGame = trpc.useMutation('deleteGame');
-
-  // trpc.useSubscription(['onGamesChange'], {
-  //   onNext(data){
-  //     setGames((games) => games.map((game) => game.id === data.id ? data : game));
-  //   }
-  // });
-
-  // trpc.useSubscription(['onGamesAdd'], {
-  //   onNext(data){
-  //     setGames((games) => [data, ...games]);
-  //   }
-  // });
-  // trpc.useSubscription(['onGamesDelete'], {
-  //   onNext(data){
-  //     setGames((games) => games.filter(game => game.id !== data));
-  //   }
-  // });
+  let [ games, setGames]  = useState<Array<CGame>>();
 
   const [focusedGameIndex, setFocusedGameIndex] = useState(0);
 
   const [isGameDialogOpen, setGameDialogOpen] = useState(false);
 
   const [isCreateGameDialogOpen, setCreateGameDialogOpen] = useState(false);
+
+  client.query({
+    query: gql`query Games {
+      games {
+        id
+        name
+        state
+        team0
+        team1
+        key0
+        key1
+        maps {
+          position
+          map
+          attacker
+          pickedBy
+        }
+        bans {
+          position
+          map
+          pickedBy
+        }
+      }
+    }
+    `
+  }).then(({data}) => setGames(data.games))
+  .catch((error) => console.log(error))
 
   return (
     <>
@@ -240,5 +242,3 @@ const Dashboard: NextPage = () => {
     </>
   )
 }
-
-export default Dashboard

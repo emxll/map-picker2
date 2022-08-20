@@ -1,8 +1,8 @@
+import { gql } from '@apollo/client'
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import client from '../../apollo-client'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
 
@@ -46,17 +46,22 @@ const Login: NextPage = () => {
             
             <Button 
               onClick={async () => {
-                // let data = await login.mutateAsync( {
-                  // password
-                // });
-                // if (data.success){
-                //   //set states
-                //   router.push('/dashboard')
-                // }
-                // else {
-                //   setError('Password incorrect!')
-                // }
-                
+                const res = await client.query({
+                  query: gql`
+                    query login($password: String!) {
+                      login(password: $password)
+                    }
+                  `,
+                  variables: {
+                    password: password
+                  }
+                });
+                if(res.data.login){
+                  router.push('/dashboard');
+                }
+                else {
+                  setError('Password incorrect!');
+                }
               }}
               className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'
             >LOGIN</Button>
