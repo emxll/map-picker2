@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { client, trpc } from "../utils/trpc"
 import { Button } from "./Button"
 import { Dialog } from "./Dialog"
 import { TextInput } from "./TextInput"
@@ -41,7 +40,7 @@ const GameCreationDialog: React.FC<{
     return true;
   }
 
-  let addGame = trpc.useMutation('addGame');
+  // let addGame = trpc.useMutation('addGame');
 
   return (
     <Dialog
@@ -103,11 +102,11 @@ const GameCreationDialog: React.FC<{
               return;
             }
 
-            addGame.mutate({
-              name,
-              team0,
-              team1
-            });
+            // addGame.mutate({
+            //   name,
+            //   team0,
+            //   team1
+            // });
             toClose();
           }}
           className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'

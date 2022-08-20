@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
-import { trpc } from '../../utils/trpc'
 
 const Login: NextPage = () => {
 
@@ -15,7 +14,7 @@ const Login: NextPage = () => {
 
   const [error, setError] = useState('');
 
-  const login = trpc.useMutation('login');
+  // const login = trpc.useMutation('login');
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
@@ -47,16 +46,16 @@ const Login: NextPage = () => {
             
             <Button 
               onClick={async () => {
-                let data = await login.mutateAsync( {
-                  password
-                });
-                if (data.success){
-                  //set states
-                  router.push('/dashboard')
-                }
-                else {
-                  setError('Password incorrect!')
-                }
+                // let data = await login.mutateAsync( {
+                  // password
+                // });
+                // if (data.success){
+                //   //set states
+                //   router.push('/dashboard')
+                // }
+                // else {
+                //   setError('Password incorrect!')
+                // }
                 
               }}
               className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'
