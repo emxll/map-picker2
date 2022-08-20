@@ -42,7 +42,8 @@ const config = {
     'Fracture',
     'Pearl'
   ],
-  graphqlUri: 'http://map-picker.local:3002/api/graphql'
+  graphqlUri: 'http://localhost:3002/api/graphql',
+  graphqlWsUri: 'ws://localhost:3002/api/graphql'
 }
 
 export { config }

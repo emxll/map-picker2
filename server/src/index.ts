@@ -9,12 +9,16 @@ import { DocumentNode } from "graphql";
 import express from 'express';
 import { resolvers } from "./graphql/resolvers";
 import { getIncomingMsgCookies } from './utils/cookie';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 
 
 
 const typeDefs = gql`
   type Game {
-    id: ID!
+    id: Int!
     name: String!
     state: Int!
     team0: String!
@@ -49,6 +53,13 @@ const typeDefs = gql`
     startGame(gameId: Int!): Boolean
     deleteGame(gameId: Int!): Boolean
   }
+
+  type Subscription {
+    gameCreated: Game!,
+    gameUpdated: Game!,
+    gameDeleted: Int!,
+  }
+
 `;
 
 
@@ -56,6 +67,8 @@ const typeDefs = gql`
 // schema. This resolver retrieves books from the "books" array above.
 
 async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
 
   const port = parseInt(process.env.PORT || '3000', 10);
   // Required logic for integrating with Express
@@ -65,15 +78,42 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
   // enabling our servers to shut down gracefully.
   const httpServer = http.createServer(app);
 
+  // Creating the WebSocket server
+  const wsServer = new WebSocketServer({
+    // This is the `httpServer` we created in a previous step.
+    server: httpServer,
+    // Pass a different path here if your ApolloServer serves at
+    // a different path.
+    path: '/api/graphql',
+  });
+
+  // Hand in the schema we just created and have the
+  // WebSocketServer start listening.
+  const serverCleanup = useServer({ 
+    schema,
+    //FIXME: auth for subscriptions
+    context: (ctx) => {
+
+    }
+  }, wsServer);
+
   // Same ApolloServer initialization as before, plus the drain plugin
   // for our httpServer.
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     csrfPrevention: true,
     cache: 'bounded',
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     context: ({req, res}) => {

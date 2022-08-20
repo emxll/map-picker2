@@ -1,4 +1,7 @@
+import { gql } from "@apollo/client"
+import { useRouter } from "next/router"
 import { useState } from "react"
+import client from "../apollo-client"
 import { Button } from "./Button"
 import { Dialog } from "./Dialog"
 import { TextInput } from "./TextInput"
@@ -7,6 +10,8 @@ const GameCreationDialog: React.FC<{
   isOpen: boolean,
   toClose: Function
 }> = ( {isOpen, toClose}) => {
+
+  const router = useRouter();
 
   const [name, setName] = useState('');
   const [team0, setTeam0] = useState('');
@@ -39,8 +44,6 @@ const GameCreationDialog: React.FC<{
 
     return true;
   }
-
-  // let addGame = trpc.useMutation('addGame');
 
   return (
     <Dialog
@@ -102,12 +105,24 @@ const GameCreationDialog: React.FC<{
               return;
             }
 
-            // addGame.mutate({
-            //   name,
-            //   team0,
-            //   team1
-            // });
-            toClose();
+            client.mutate({
+              mutation: gql`
+                mutation NewGame($name: String!, $team0: String!, $team1: String!) {
+                  newGame(name: $name, team0: $team0, team1: $team1)
+                }
+              `,
+              variables: {
+                name,
+                team0,
+                team1
+              }
+            }).then(() => {
+              toClose()
+              setName('');
+              setTeam0('');
+              setTeam1('');
+            }).catch(e => {console.error(e); router.push('/login')});
+            
           }}
           className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'
         >CREATE</Button>

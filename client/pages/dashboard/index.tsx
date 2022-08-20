@@ -6,15 +6,15 @@ import { useCallback, useEffect, useState } from "react"
 import { config } from "../../config"
 import { GameCreationDialog } from "../../components/GameCreationDialog"
 import { CGame } from "../../utils/types"
-import client from "../../apollo-client"
 import { gql } from "@apollo/client"
 import { useRouter } from "next/router"
+import client from "../../apollo-client"
 
 export default () => {
 
   const router = useRouter();
 
-  let [ games, setGames]  = useState<Array<CGame>>();
+  let [ games, setGames]  = useState<Array<CGame>>([]);
 
   const [focusedGameIndex, setFocusedGameIndex] = useState(0);
 
@@ -22,32 +22,111 @@ export default () => {
 
   const [isCreateGameDialogOpen, setCreateGameDialogOpen] = useState(false);
 
-  client.query({
-    query: gql`query Games {
-      games {
-        id
-        name
-        state
-        team0
-        team1
-        key0
-        key1
-        maps {
-          position
-          map
-          attacker
-          pickedBy
+  useEffect( () => {
+    client.query({
+      query: gql`
+        query Games {
+          games {
+            id
+            name
+            state
+            team0
+            team1
+            key0
+            key1
+            maps {
+              position
+              map
+              attacker
+              pickedBy
+            }
+            bans {
+              position
+              map
+              pickedBy
+            }
+          }
         }
-        bans {
-          position
-          map
-          pickedBy
+      `
+    }).then(({data}) => setGames(data.games))
+    .catch(error => {console.error(error); router.push('/login')})
+
+    const onDeleted = client.subscribe({
+      query: gql`
+        subscription Subscription {
+          gameDeleted
         }
-      }
+      `,
+    }).subscribe( ( {data}: any) => {
+      setGames((games) => games.filter(game => game.id !== data.gameDeleted));
+    });
+    const onCreated = client.subscribe({
+      query: gql`
+        subscription GameCreated {
+          gameCreated {
+            id
+            name
+            state
+            team0
+            team1
+            key0
+            key1
+            maps {
+              position
+              map
+              attacker
+              pickedBy
+            }
+            bans {
+              position
+              map
+              pickedBy
+            }
+          }
+        }
+      `,
+    }).subscribe( ( {data}: any) => {
+      setGames((games) => [data.gameCreated, ...games]);
+    });
+
+    const onUpdated = client.subscribe({
+      query: gql`
+        subscription GameUpdated {
+          gameUpdated {
+            id
+            name
+            state
+            team0
+            team1
+            key0
+            key1
+            maps {
+              position
+              map
+              attacker
+              pickedBy
+            }
+            bans {
+              position
+              map
+              pickedBy
+            }
+          }
+        }
+      `,
+    }).subscribe( ( {data}: any) => {
+      setGames((games) => games.map((game) => game.id === data.gameUpdated.id ? data.gameUpdated : game));
+    });
+
+
+
+    return () => {
+      onDeleted.unsubscribe();
+      onCreated.unsubscribe();
+      onUpdated.unsubscribe();
     }
-    `
-  }).then(({data}) => setGames(data.games))
-  .catch((error) => console.log(error))
+
+  }, [])
 
   return (
     <>
@@ -165,9 +244,16 @@ export default () => {
                   <Button 
                     className="w-full mt-2 p-4 border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md"
                     onClick={(e) => { 
-                      // startGame.mutate({
-                      //   gameID: games![focusedGameIndex].id
-                      // })
+                      client.mutate({
+                        mutation: gql`
+                          mutation StartGame($gameId: Int!) {
+                            startGame(gameId: $gameId)
+                          }
+                        `,
+                        variables: {
+                          gameId: games![focusedGameIndex].id
+                        }
+                      })
                     }}
                   >START GAME</Button>
                   <div className="p-1"></div>
@@ -176,11 +262,17 @@ export default () => {
               <Button 
                   className="w-full mt-2 p-4 border-2 border-red-300 bg-red-500 active:bg-red-400 drop-shadow-md"
                   onClick={(e) => {
-                    //FIXME: implement confirmation dialog
-                    // deleteGame.mutate({
-                    //   gameID: games![focusedGameIndex].id
-                    // });
-                    setGameDialogOpen(false);
+                    client.mutate({
+                      mutation: gql`
+                        mutation DeleteGame($gameId: Int!) {
+                          deleteGame(gameId: $gameId)
+                        }
+                      `,
+                      variables:{
+                        gameId: games![focusedGameIndex].id
+                      }
+                    }).then(() => setGameDialogOpen(false)).catch((e) => {console.error(e); router.push('/login')})
+                    
                   }}
                 >DELETE</Button>
             </div>

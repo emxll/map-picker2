@@ -4,6 +4,7 @@ import { Auth, CGame, Context, Game } from '../utils/types'
 import crypto from 'crypto'
 import { prisma } from "../utils/prisma";
 import express from 'express';
+import { pubsub } from "./pubsub";
 
 function adminAuth(auth: Auth, res: express.Response){
 
@@ -34,7 +35,6 @@ export const resolvers = {
       return false;
     },
     async games(_: any, __ : any, {auth, res}: Context){
-      console.dir(auth);
       adminAuth(auth, res);
       return await prisma.game.findMany({
         orderBy: {
@@ -88,7 +88,9 @@ export const resolvers = {
           }
         }
       });
-      // emit game to pubsub
+      pubsub.publish('GAME_CREATED', {
+        gameCreated: newGame
+      });
     },
     async startGame(_: any, { gameId }: {gameId: number}, { auth, res}: Context){
 
@@ -125,7 +127,9 @@ export const resolvers = {
           }
         }
       });
-      //emit game to pubsub
+      pubsub.publish('GAME_UPDATED', {
+        gameUpdated: updatedGame
+      });
     },
     /*async banMap(_, { id, map }, { dataSources, auth }){
 
@@ -253,15 +257,32 @@ export const resolvers = {
     async deleteGame(_: any, { gameId }: {gameId: number}, { auth, res}: Context){
 
       adminAuth(auth, res);
-
-      let del = prisma.game.delete({
-        where: {
-          id: gameId
-        }
-      });
-
-      //emit to pubsub
+      
+      try{
+        await prisma.game.delete({
+          where: {
+            id: gameId
+          }
+        });
+        pubsub.publish('GAME_DELETED', {
+          gameDeleted: gameId,
+        });
+        return true;
+      }catch(e){
+        return false;
+      }
     }
+  },
+  Subscription: {
+    gameCreated: {
+      subscribe: () => pubsub.asyncIterator(['GAME_CREATED']),
+    },
+    gameUpdated: {
+      subscribe: () => pubsub.asyncIterator(['GAME_UPDATED']),
+    },
+    gameDeleted: {
+      subscribe: () => pubsub.asyncIterator(['GAME_DELETED']),
+    },
   }
 }
 
