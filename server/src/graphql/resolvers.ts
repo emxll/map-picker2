@@ -5,6 +5,9 @@ import crypto from 'crypto'
 import { prisma } from "../utils/prisma";
 import express from 'express';
 import { pubsub } from "./pubsub";
+import { withFilter } from "graphql-subscriptions";
+import { subscribe } from "graphql";
+import { nextTick } from "process";
 
 function adminAuth(auth: Auth, res: express.Response){
 
@@ -108,9 +111,7 @@ export const resolvers = {
           }
         }
       });
-      pubsub.publish('GAME_CREATED', {
-        gameCreated: newGame
-      });
+      pubsub.publish('GAME_CREATED', newGame);
     },
     async startGame(_: any, { gameId }: {gameId: number}, { auth, res}: Context){
 
@@ -147,9 +148,7 @@ export const resolvers = {
           }
         }
       });
-      pubsub.publish('GAME_UPDATED', {
-        gameUpdated: updatedGame
-      });
+      pubsub.publish('GAME_UPDATED', updatedGame);
     },
     /*async banMap(_, { id, map }, { dataSources, auth }){
 
@@ -284,9 +283,7 @@ export const resolvers = {
             id: gameId
           }
         });
-        pubsub.publish('GAME_DELETED', {
-          gameDeleted: gameId,
-        });
+        pubsub.publish('GAME_DELETED', gameId);
         return true;
       }catch(e){
         return false;
@@ -294,14 +291,87 @@ export const resolvers = {
     }
   },
   Subscription: {
+    game: {
+      subscribe: withFilter(
+        //This (resolveFn) has to return an ITERATOR, the other subscriptions return an ITERABLE!
+        () => {
+          const iterator = pubsub.asyncIterator(['GAME_UPDATED']);
+          return {
+            async next(){
+              let game = await (await iterator.next()).value;
+              return {
+                done: false,
+                value: {
+                  game: game
+                }
+              };
+            }
+          }
+        },
+        ({game}: {game: CGame}, {gameId}: {gameId: number}) => {
+          return game.id === gameId;
+        }
+      )
+    },
     gameCreated: {
-      subscribe: () => pubsub.asyncIterator(['GAME_CREATED']),
+      subscribe: () => {
+        const iterator = pubsub.asyncIterator(['GAME_CREATED']);
+        return {
+          [Symbol.asyncIterator](){
+            return {
+              async next(){
+                let game = await (await iterator.next()).value;
+                return {
+                  done: false,
+                  value: {
+                    gameCreated: game
+                  }
+                };
+              }
+            }
+          }
+        }
+      },
     },
     gameUpdated: {
-      subscribe: () => pubsub.asyncIterator(['GAME_UPDATED']),
+      subscribe: () => {
+        const iterator = pubsub.asyncIterator(['GAME_UPDATED']);
+        return {
+          [Symbol.asyncIterator](){
+            return {
+              async next(){
+                let game = await (await iterator.next()).value;
+                return {
+                  done: false,
+                  value: {
+                    gameUpdated: game
+                  }
+                };
+              }
+            }
+          }
+        }
+      },
     },
     gameDeleted: {
-      subscribe: () => pubsub.asyncIterator(['GAME_DELETED']),
+      subscribe: () => {
+        const iterator = pubsub.asyncIterator(['GAME_DELETED']);
+        return {
+          [Symbol.asyncIterator](){
+            return {
+              async next(){
+                let gameId = await (await iterator.next()).value;
+                return {
+                  done: false,
+                  value: {
+                    gameDeleted: gameId
+                  }
+                };
+              }
+            }
+          }
+        }
+      },
     },
   }
 }

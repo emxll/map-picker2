@@ -239,20 +239,22 @@ export default () => {
               <div className="flex-row">
                 <h2 className='text-2xl font-bold text-gray-600 select-none'>Links</h2>
               </div>
-              <div className="flex flex-row flex-wrap">
-                <span className="pr-4">{games[focusedGameIndex].team0}: </span>
-                <div className="bg-gray-200 rounded-md mt-1">
-                  <span className="text-xs text-indigo-900"><pre className="p-1">
-                    {`${window.location.origin}/game/${games[focusedGameIndex].id}/?key=${games[focusedGameIndex].key0}`}
-                  </pre></span>
+              <div className="pl-1">
+                <div className="flex flex-row flex-wrap">
+                  <span className="pr-4">{games[focusedGameIndex].team0}: </span>
+                  <div className="bg-gray-200 rounded-md mt-1">
+                    <span className="text-xs text-indigo-900"><pre className="p-1">
+                      {`${window.location.origin}/game/${games[focusedGameIndex].id}/?key=${games[focusedGameIndex].key0}`}
+                    </pre></span>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2 flex flex-row flex-wrap pt-1">
-                <span className="pr-4">{games[focusedGameIndex].team1}: </span>
-                <div className="bg-gray-200 rounded-md mt-1">
-                  <span className="text-xs text-indigo-900"><pre className="p-1">
-                    {`${window.location.origin}/game/${games[focusedGameIndex].id}/?key=${games[focusedGameIndex].key1}`}
-                  </pre></span>
+                <div className="mt-[0.5rem] flex flex-row flex-wrap">
+                  <span className="pr-4">{games[focusedGameIndex].team1}: </span>
+                  <div className="bg-gray-200 rounded-md mt-1">
+                    <span className="text-xs text-indigo-900"><pre className="p-1">
+                      {`${window.location.origin}/game/${games[focusedGameIndex].id}/?key=${games[focusedGameIndex].key1}`}
+                    </pre></span>
+                  </div>
                 </div>
               </div>
               <div className="p-4"></div>

@@ -56,6 +56,7 @@ const typeDefs = gql`
   }
 
   type Subscription {
+    game(gameId: Int!): Game!,
     gameCreated: Game!,
     gameUpdated: Game!,
     gameDeleted: Int!,
