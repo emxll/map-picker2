@@ -45,7 +45,8 @@ const typeDefs = gql`
  
   type Query {
     login(password: String!): Boolean
-    games: [Game]
+    games: [Game],
+    game(gameId: Int!): Game
   }
 
   type Mutation {

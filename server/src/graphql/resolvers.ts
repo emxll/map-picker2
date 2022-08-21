@@ -25,6 +25,7 @@ function teamAuth(game: Game, auth: Auth){
   else throw new ApolloError('Password incorrect', 'UNAUTHORIZED');
 }
 
+//FIXME: add field resolver for keys
 export const resolvers = {
   Query: {
     async login(_: any, {password}: {password: string}, {res}: Context){
@@ -53,6 +54,25 @@ export const resolvers = {
           }
         }
       })
+    },
+    async game(_: any, {gameId} : {gameId: number}){
+      return await prisma.game.findUnique({
+        where:{
+          id: gameId
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
+        }
+      });
     }
   },
   Mutation: {
