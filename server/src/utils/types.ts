@@ -23,7 +23,7 @@ export type Game = {
 export type Map = {
   position: number,
   map: number,
-  attacker: number,
+  attacker: number | null,
   pickedBy: number
   gameId: number
 }

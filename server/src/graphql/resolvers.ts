@@ -9,6 +9,7 @@ import { withFilter } from "graphql-subscriptions";
 import { getNamedType, subscribe, valueFromAST } from "graphql";
 import { nextTick } from "process";
 import { Events } from "../../constants";
+import { isJsxFragment } from "typescript";
 
 function adminAuth(auth: Auth, res: express.Response){
 
@@ -27,6 +28,63 @@ function teamAuth(game: Game, auth: Auth){
   if(auth.authKey === game.key0)return 0;
   else if(auth.authKey === game.key1) return 1;
   else throw new ApolloError('Key incorrect', 'UNAUTHORIZED');
+}
+
+function scheduleRandomMapSelection(game: CGame){
+  if(
+    game.state >= config.schedule.length
+    || config.schedule[game.state].event !== Events.RANDOM
+  ) return;
+
+  setTimeout( async () => {
+
+    let maps = [];
+
+    //saving myself the sort at the cost of O(n^2) vs O(n*log(n))
+    for(let i = 0; i < config.maps.length; i++){
+      if(game.maps.some(map => map.map === i)) continue;
+      maps.push(i);
+    }
+    
+    let newMap = {
+      map: maps[Math.floor(Math.random() * maps.length)],
+      position: game.maps.length,
+      gameId: game.id,
+      attacker: Math.floor(Math.random() * 2),
+      pickedBy: -1,
+    }
+
+    game.state += 1;
+
+    await prisma.map.create({data: newMap});
+    
+    let updatedGame = await prisma.game.update({
+      where: {
+        id: game.id
+      },
+      data: {
+        state: game.state
+      },
+      include: {
+        bans: {
+          orderBy: {
+            position: 'asc'
+          }
+        },
+        maps: {
+          orderBy: {
+            position: 'asc'
+          }
+        }
+      }
+    });
+
+    pubsub.publish('GAME_UPDATED', updatedGame);
+
+    scheduleRandomMapSelection(updatedGame);
+
+  }, config.randomMapTimeout);
+
 }
 
 //FIXME: add field resolver for keys
@@ -165,7 +223,12 @@ export const resolvers = {
           }
         }
       });
+
       pubsub.publish('GAME_UPDATED', updatedGame);
+      scheduleRandomMapSelection(updatedGame);
+
+      return true;
+
     },
 
     //FIXME: validate map parameter input range
@@ -215,24 +278,36 @@ export const resolvers = {
 
       game.state += 1;
 
-      game.bans.push(ban);
-
       await prisma.ban.create({
         data: ban
       });
-      await prisma.game.update({
+
+      let updatedGame = await prisma.game.update({
         where: {
           id: game.id
         },
         data: {
           state: game.state
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
         }
       });
 
-      pubsub.publish('GAME_UPDATED', game);
+      pubsub.publish('GAME_UPDATED', updatedGame);
+
+      scheduleRandomMapSelection(updatedGame);
 
       return true;
-      //FIXME: random map stuff
       
     },
 
@@ -293,21 +368,31 @@ export const resolvers = {
         data: newMap
       });
 
-      await prisma.game.update({
+      let updatedGame = await prisma.game.update({
         where: {
           id: game.id
         },
         data: {
           state: game.state
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
         }
       });
 
-      game.maps.push(newMap);
-
-      pubsub.publish('GAME_UPDATED', game);
+      pubsub.publish('GAME_UPDATED', updatedGame);
+      scheduleRandomMapSelection(updatedGame);
 
       return true;
-      //FIXME: random map stuff
 
     },
 
@@ -343,7 +428,6 @@ export const resolvers = {
         || config.schedule[game.state].team !== team
       ) throw new ApolloError('This team can\'t pick a side right now.', 'BAD_REQUEST');
       
-      game.maps[game.maps.length - 1].attacker = attacker;
       game.state += 1;
 
       await prisma.map.update({
@@ -357,19 +441,31 @@ export const resolvers = {
           attacker: attacker
         }
       });
-      await prisma.game.update({
+      let updatedGame = await prisma.game.update({
         where: {
           id: game.id
         },
         data: {
           state: game.state
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
         }
       });
 
-      pubsub.publish('GAME_UPDATED', game);
+      pubsub.publish('GAME_UPDATED', updatedGame);
+      scheduleRandomMapSelection(updatedGame);
 
       return true;
-      //FIXME: random map stuff
 
     },
     async deleteGame(_: any, { gameId }: {gameId: number}, { auth, res}: Context){

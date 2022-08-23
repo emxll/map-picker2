@@ -1,7 +1,8 @@
 import { Events } from "./constants"
 
-const config = { 
+const config = {
   password: 'password',
+  randomMapTimeout: 3000,
   schedule: [
     {
       event: Events.BAN,
