@@ -12,7 +12,7 @@ const config = {
       team: 1
     },
     {
-      event: Events.PICK,
+      event: Events.PICK,  //events.PICK must be followed by events.PICK_SIDE, the app cannot handle anything else.
       team: 0
     },
     {
@@ -29,7 +29,7 @@ const config = {
     },
     {
       event: Events.RANDOM,
-      team: 0
+      team: -1 //for typesafety
     },
   ],
   maps: [

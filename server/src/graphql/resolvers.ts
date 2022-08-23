@@ -6,8 +6,9 @@ import { prisma } from "../utils/prisma";
 import express from 'express';
 import { pubsub } from "./pubsub";
 import { withFilter } from "graphql-subscriptions";
-import { subscribe } from "graphql";
+import { getNamedType, subscribe, valueFromAST } from "graphql";
 import { nextTick } from "process";
+import { Events } from "../../constants";
 
 function adminAuth(auth: Auth, res: express.Response){
 
@@ -21,11 +22,11 @@ function adminAuth(auth: Auth, res: express.Response){
 }
 
 function teamAuth(game: Game, auth: Auth){
-  if (auth.authKey) throw new ApolloError('No key supplied', 'UNAUTHENTICATED');
+  if (!auth.authKey) throw new ApolloError('No key supplied', 'UNAUTHENTICATED');
 
   if(auth.authKey === game.key0)return 0;
   else if(auth.authKey === game.key1) return 1;
-  else throw new ApolloError('Password incorrect', 'UNAUTHORIZED');
+  else throw new ApolloError('Key incorrect', 'UNAUTHORIZED');
 }
 
 //FIXME: add field resolver for keys
@@ -37,6 +38,22 @@ export const resolvers = {
         return true;
       }
       return false;
+    },
+    async getTeam(_: any, {gameId}: {gameId: number}, {auth, res}: Context){
+      let game = await prisma.game.findUnique({
+        where: {
+          id: gameId,
+        }
+      });
+
+      if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
+
+      try{ 
+        return teamAuth(game, auth);
+      }catch(e){
+        return null;
+      }
+
     },
     async games(_: any, __ : any, {auth, res}: Context){
       adminAuth(auth, res);
@@ -150,129 +167,211 @@ export const resolvers = {
       });
       pubsub.publish('GAME_UPDATED', updatedGame);
     },
-    /*async banMap(_, { id, map }, { dataSources, auth }){
 
-      let game = await dataSources.ds.getGame(id);
+    //FIXME: validate map parameter input range
+    async banMap(_: any, { gameId, map }: {gameId: number, map: number}, { auth }: Context){
+      
+      let game = await prisma.game.findUnique({
+        where: {
+          id: gameId,
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
+        }
+      });
+
+      if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
+      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
+      if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
       let team = teamAuth(game, auth);
 
-      if(config.schedule[game.state].event !== Events.BAN || config.schedule[game.state].team !== team ){
-        throw new ApolloError('This team is currently not allowed to ban a map.');
-      }
+      if(
+        config.schedule[game.state].event !== Events.BAN 
+        || config.schedule[game.state].team !== team
+      ) throw new ApolloError('This team can\'t ban a map right now.', 'BAD_REQUEST');
 
-      if(map < 0 || map >= config.maps.length){
-        throw new ApolloError('Invalid map.');
-      }
+      if(map < 0 || map >= config.maps.length) throw new ApolloError('Invalid map.', 'BAD_REQUEST');
 
-      let bans = await dataSources.ds.getBans(id);
-
-      if (bans.some( (ban) => ban.map === map )){
-        throw new ApolloError('This map has already been banned.');
-      }
+      if (
+        game.bans.some( (ban) => ban.map === map )
+      ) throw new ApolloError('This map has already been banned.', 'BAD_REQUEST');
 
       let ban = {
         map: map,
-        position: bans.length,
-        gameID: id,
+        position: game.bans.length,
+        gameId: game.id,
+        pickedBy: team,
       }
 
       game.state += 1;
 
-      scheduleRandomMapSelection(game);
+      game.bans.push(ban);
 
-      await dataSources.ds.createBan(ban);
-      await dataSources.ds.updateGame(id,game);
+      await prisma.ban.create({
+        data: ban
+      });
+      await prisma.game.update({
+        where: {
+          id: game.id
+        },
+        data: {
+          state: game.state
+        }
+      });
 
-      bans.push(ban);
-      
-      game.bans = bans;
-
-      fillGame(game, dataSources.ds);
-
-      pubsub.publish('GAME_UPDATE', { observeGame: game});
+      pubsub.publish('GAME_UPDATED', game);
 
       return true;
-
+      //FIXME: random map stuff
+      
     },
-    async pickMap(_, { id, map }, { dataSources, auth }){
 
-      let game = await dataSources.ds.getGame(id);
+    //FIXME: validate map parameter input range
+    async pickMap(_: any, {gameId, map}: { gameId: number, map: number }, { auth, res }: Context){
+
+      let game = await prisma.game.findUnique({
+        where: {
+          id: gameId,
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
+        }
+      });
+
+      if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
+      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
+      if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
+
 
       let team = teamAuth(game, auth);
 
-      if(config.schedule[game.state].event !== Events.PICK || config.schedule[game.state].team !== team ){
-        throw new ApolloError('This team is currently not allowed to pick a map.');
-      }
+      if(
+        config.schedule[game.state].event !== Events.PICK 
+        || config.schedule[game.state].team !== team
+      ) throw new ApolloError('This team can\'t pick a map right now.', 'BAD_REQUEST');
 
-      if(map < 0 || map >= config.maps.length){
-        throw new ApolloError('Invalid map.');
-      }
+      if(map < 0 || map >= config.maps.length) throw new ApolloError('Invalid map.', 'BAD_REQUEST');
 
-      let maps = await dataSources.ds.getMaps(id);
+      if (
+        game.maps.some( (_map) => _map.map === map )
+      ) throw new ApolloError('This map has already been picked.', 'BAD_REQUEST');
 
-      if (maps.some( (_map) => _map.map === map )){
-        throw new ApolloError('This map has already been picked.');
-      }
-
-      let bans = await dataSources.ds.getBans(id);
-
-      if (bans.some( (ban) => ban.map === map )){
-        throw new ApolloError('This map has been banned.');
-      }
+      if (
+        game.bans.some( (ban) => ban.map === map )
+      ) throw new ApolloError('This map has been banned.', 'BAD_REQUEST');
 
       let newMap = {
         map: map,
-        position: maps.length,
-        gameID: id,
+        position: game.maps.length,
+        gameId: game.id,
+        attacker: null,
+        pickedBy: team
       }
 
       game.state += 1;
 
-      await dataSources.ds.createMap(newMap);
-      await dataSources.ds.updateGame(id, game);
+      await prisma.map.create({
+        data: newMap
+      });
 
-      maps.push(newMap);
+      await prisma.game.update({
+        where: {
+          id: game.id
+        },
+        data: {
+          state: game.state
+        }
+      });
 
-      game.maps = maps;
-      game.bans = bans;
+      game.maps.push(newMap);
 
-      //this shouldnt do anything
-      fillGame(game, dataSources.ds);
-
-      pubsub.publish('GAME_UPDATE', { observeGame: game});
+      pubsub.publish('GAME_UPDATED', game);
 
       return true;
+      //FIXME: random map stuff
 
     },
-    async pickSide(_, { id, attacking}, { dataSources, auth }){
 
-      let game = await dataSources.ds.getGame(id);
+    //FIXME: validate attacker!!! parameter input range
+    async pickSide(_: any, { gameId, attacker }: {gameId: number, attacker: number}, { auth, res }: Context){
+
+      let game = await prisma.game.findUnique({
+        where: {
+          id: gameId,
+        },
+        include: {
+          bans: {
+            orderBy: {
+              position: 'asc'
+            }
+          },
+          maps: {
+            orderBy: {
+              position: 'asc'
+            }
+          }
+        }
+      });
+
+      if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
+      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
+      if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
       let team = teamAuth(game, auth);
 
-      if(config.schedule[game.state].event !== Events.PICK_SIDE || config.schedule[game.state].team !== team ){
-        throw new ApolloError('This team is currently not allowed to pick a side.');
-      }
-
-      let maps = await dataSources.ds.getMaps(id);
-
-      scheduleRandomMapSelection(game);
-
-      maps[maps.length - 1].attacker = ( team === 1 ^ !attacking ) ? 1 : 0
+      if(
+        config.schedule[game.state].event !== Events.PICK_SIDE 
+        || config.schedule[game.state].team !== team
+      ) throw new ApolloError('This team can\'t pick a side right now.', 'BAD_REQUEST');
       
-      await dataSources.ds.updateMap(id, maps.length - 1, maps[maps.length - 1]);
-      await dataSources.ds.updateGame(id, {state : game.state + 1});
+      game.maps[game.maps.length - 1].attacker = attacker;
+      game.state += 1;
 
-      game.maps = maps;
+      await prisma.map.update({
+        where: {
+          position_gameId: {
+            gameId: game.id,
+            position: game.maps.length - 1,
+          }
+        },
+        data:{
+          attacker: attacker
+        }
+      });
+      await prisma.game.update({
+        where: {
+          id: game.id
+        },
+        data: {
+          state: game.state
+        }
+      });
 
-      fillGame(game, dataSources.ds);
-
-      pubsub.publish('GAME_UPDATE', { observeGame: game});
+      pubsub.publish('GAME_UPDATED', game);
 
       return true;
+      //FIXME: random map stuff
 
     },
-    */
     async deleteGame(_: any, { gameId }: {gameId: number}, { auth, res}: Context){
 
       adminAuth(auth, res);
@@ -298,13 +397,16 @@ export const resolvers = {
           const iterator = pubsub.asyncIterator(['GAME_UPDATED']);
           return {
             async next(){
-              let game = await (await iterator.next()).value;
+              let payload = await iterator.next();
               return {
-                done: false,
+                done: payload.done,
                 value: {
-                  game: game
+                  game: payload.value,
                 }
               };
+            },
+            async return(){
+              return await iterator.return!();
             }
           }
         },

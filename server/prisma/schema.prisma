@@ -28,7 +28,7 @@ model Game {
 model Map {
   position Int
   map      Int
-  attacker Int
+  attacker Int?
   pickedBy Int // -1 for random choice
 
   game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)

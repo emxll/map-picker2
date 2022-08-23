@@ -25,12 +25,14 @@ export type Map = {
   map: number,
   attacker: number,
   pickedBy: number
+  gameId: number
 }
 
 export type Ban = {
   position: number,
   map: number,
   pickedBy: number,
+  gameId: number
 }
 
 export type CGame = Game & {

@@ -201,12 +201,14 @@ export default () => {
 
                             <div className="flex flex-row font-semibold justify-center drop-shadow">{config.maps[map.map]}</div>
                             <div className="p-1"></div>
-                            <div className="flex flex-row justify-center">
-                              <FireIcon className="h-5 w-5 mx-2 text-red-400"></FireIcon>
-                              <span className="text-gray-500">{
-                                map.attacker === 0 ? games![focusedGameIndex].team0 : games![focusedGameIndex].team1
-                              }</span>
-                            </div>
+                            { map.attacker !== null &&
+                              <div className="flex flex-row justify-center">
+                                <FireIcon className="h-5 w-5 mx-2 text-red-400"></FireIcon>
+                                <span className="text-gray-500">{
+                                  map.attacker === 0 ? games![focusedGameIndex].team0 : games![focusedGameIndex].team1
+                                }</span>
+                              </div>
+                            }
 
                             <div className="p-1"></div>
                             <div className="flex flex-row justify-center">

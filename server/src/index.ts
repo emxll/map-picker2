@@ -45,6 +45,7 @@ const typeDefs = gql`
  
   type Query {
     login(password: String!): Boolean
+    getTeam(gameId: Int!): Int
     games: [Game],
     game(gameId: Int!): Game
   }
@@ -52,6 +53,9 @@ const typeDefs = gql`
   type Mutation {
     newGame(name: String!, team0: String!, team1: String!): Boolean
     startGame(gameId: Int!): Boolean
+    banMap(gameId: Int!, map: Int!): Boolean
+    pickMap(gameId: Int!, map: Int!): Boolean
+    pickSide(gameId: Int!, attacker: Int!): Boolean
     deleteGame(gameId: Int!): Boolean
   }
 
@@ -120,10 +124,15 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
     ],
     context: ({req, res}) => {
       const cookies = getIncomingMsgCookies(req);
+      let authKey = '';
+      if(req.headers.authorization){
+        let a = req.headers.authorization.split(' ');
+        if(a[1] && a[0] === 'Key') authKey = a[1]; 
+      }
       return {
         auth: {
           password: cookies.password,
-          authKey: cookies.authKey,
+          authKey: authKey,
         },
         res: res
       }
