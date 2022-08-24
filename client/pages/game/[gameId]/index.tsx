@@ -49,12 +49,12 @@ export default () => {
 
     for(var mapIdx = 0; mapIdx < 8; mapIdx++){
 
-      if(game?.state === Events.BAN){
+      if(config.schedule[game.state].event === Events.BAN){
         //check if already banned
         if(game.bans.some(ban => ban.map === mapIdx)) continue;
       }
 
-      if(game?.state === Events.PICK){
+      if(config.schedule[game.state].event === Events.PICK){
         //check if already banned or picked
         if(game.maps.some(map => map.map === mapIdx) || game.bans.some(ban => ban.map === mapIdx)) continue;
       }
@@ -269,6 +269,11 @@ export default () => {
           </>
           :
           <>
+            { config.schedule[game!.state].event === Events.BAN ? <>
+              Ban a map
+            </> : <>
+              Pick a map
+            </> }
             <MapRow arr={[0,1,2,3]}></MapRow>
             <MapRow arr={[4,5,6,7]}></MapRow>
           </>
