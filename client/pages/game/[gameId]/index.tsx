@@ -8,6 +8,7 @@ import { config } from "../../../config"
 import { Events } from "../../../constants";
 import { AuthContext, Auth } from "../../_app";
 import { Dialog } from "../../../components/Dialog";
+import Head from "next/head";
 
 export default () => {
 
@@ -250,7 +251,65 @@ export default () => {
     </>
   }
 
+  const PickedMapRow: React.FC = () => {
+    return <>{game &&
+        <div className="flex flex-row flex-wrap">
+          {Array.from(Array(config.pickedMapCount).keys()).map(mapIdx => 
+            mapIdx < game.maps.length &&
+            <Fragment key={mapIdx}>
+              <div 
+                className="flex" style={{
+                  width: "20vw",
+                  height: "20vh",
+                  position: "relative"
+              }}>
+                <Image
+                  src={config.mapUrls[game.maps[mapIdx].map]}
+                  alt={config.maps[game.maps[mapIdx].map]}
+                  layout="fill"
+                  objectFit="contain"
+                ></Image>
+              </div>
+            </Fragment>
+          )}
+        </div>
+      }</>
+  }
+  const BannedMapRow: React.FC = () => {
+    return <>{game &&
+        <div className="flex flex-row flex-wrap">
+          {Array.from(Array(config.bannedMapCount).keys()).map(banIdx => 
+            banIdx < game.bans.length &&
+            <Fragment key={banIdx}>
+              <div 
+                className="flex" style={{
+                  width: "20vw",
+                  height: "20vh",
+                  position: "relative"
+              }}>
+                <Image
+                  src={config.mapUrls[game.bans[banIdx].map]}
+                  alt={config.maps[game.bans[banIdx].map]}
+                  layout="fill"
+                  objectFit="contain"
+                ></Image>
+              </div>
+            </Fragment>
+          )}
+        </div>
+      }</>
+  }
+
   return <>
+    <Head>
+      <style>{`
+        body {
+          background-image: url(/img/bg.png);
+          background-size: cover;
+
+        }
+        `}</style>
+    </Head>
     <Dialog isOpen={isDialogOpen} toClose={() => {}}>
       {isDialogOpen && 
 
@@ -281,6 +340,7 @@ export default () => {
         </div>
       }
     </Dialog>
-    {JSON.stringify(game)}
+    <PickedMapRow></PickedMapRow>
+    <BannedMapRow></BannedMapRow>
   </>
 }

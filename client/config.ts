@@ -31,6 +31,8 @@ const config = {
       team: -1 //for typesafety
     },
   ],
+  pickedMapCount: 3,
+  bannedMapCount: 2,
   maps: [
     'Bind',
     'Ascent',
