@@ -12,6 +12,7 @@ import Head from "next/head";
 
 import styles from '../../../styles/Game.module.css'
 import { getStatusMsg } from "../../../utils/lang";
+import format from "string-template";
 
 export default () => {
 
@@ -238,22 +239,26 @@ export default () => {
     onClick: MouseEventHandler,
     className?: string
   }> = ({children, onClick, className}) => {
-    return <div className={`bg-clip-content relative ${!className ? '' : className}`}>
-      <div
-        className="absolute w-full h-full flex justify-center items-center"
-      >
-        <div>{children}</div>
-      </div>
-      <div className={`absolute w-full h-full ${styles['button-overlay']}`}></div>
-      <div className={`absolute w-full h-full flex justify-center items-center ${styles['button-corners-container']}`}>
-        <div className={`w-full h-full flex flex-col justify-between ${styles['button-corners-container-inner']}`}>
-          <div className="flex justify-between">
-            <div className={`${styles['button-corners']}`}></div>
-            <div className={`${styles['button-corners']}`}></div>
-          </div>
-          <div className="flex justify-between">
-            <div className={`${styles['button-corners']}`}></div>
-            <div className={`${styles['button-corners']}`}></div>
+    return <div 
+      className={`cursor-pointer ${styles['button-container']}`}
+      onClick={onClick}
+    >
+      <div className={`bg-clip-content relative ${!className ? '' : className}`}>
+        <div
+          className="absolute w-full h-full flex justify-center items-center"
+        >
+          <div className="text-white text-2xl">{children}</div>
+        </div>
+        <div className={`absolute w-full h-full flex justify-center items-center ${styles['button-overlay']}`}>
+          <div className={`absolute w-full h-full flex flex-col justify-between ${styles['button-corners-container']}`}>
+            <div className="flex justify-between">
+              <div className={`${styles['button-corners']}`}></div>
+              <div className={`${styles['button-corners']}`}></div>
+            </div>
+            <div className="flex justify-between">
+              <div className={`${styles['button-corners']}`}></div>
+              <div className={`${styles['button-corners']}`}></div>
+            </div>
           </div>
         </div>
       </div>
@@ -334,12 +339,12 @@ export default () => {
           }}
         >
           <div className="relative mt-[10px] opacity-90 bg-red-400 left-[-1rem] flex justify-center items-center">
-            <span className="m-2 text-xl font-semibold text-[#0d2842]">
+            <span className="select-none m-2 text-xl font-semibold text-[#0d2842]">
               {attTeam}
             </span>
           </div>
           <div className="relative mb-[10px] opacity-90 bg-emerald-400 left-[-1rem] flex justify-start items-center">
-            <span className="m-2 text-xl font-semibold text-[#0d2842]">
+            <span className="select-none m-2 text-xl font-semibold text-[#0d2842]">
               {defTeam}
             </span>
           </div>
@@ -431,23 +436,30 @@ export default () => {
         <div className={`relative w-[80vw] ${styles['dialog']}`}>
           {
             config.schedule[game!.state].event === Events.PICK_SIDE ? 
-            <>
-                <p>Map {game!.maps.length } will be {config.maps[game!.maps[game!.maps.length - 1].map]}.</p>
-                <p>Do you want to start on attacker or defender side on this map?</p>
-                <ValorantButton className="bg-emerald-400 w-[300px] h-[100px]" onClick={() => {
+            <>  
+              <div className="mt-4 mb-8 text-gray-300 text-xl flex flex-col items-center">
+                <p>{format(config.language.NEXT_MAP, {
+                  number: game!.maps.length,
+                  map: config.maps[game!.maps[game!.maps.length - 1].map]
+                })}</p>
+                <p>{config.language.PICK_SIDE_IMPERATIVE}</p>
+              </div>
+              <div className="mb-4 flex justify-evenly">
+                <ValorantButton className="bg-red-400 w-[200px] h-[80px]" onClick={() => {
                   handleSidePick(true);
-                }}>Attack</ValorantButton>
-                {/* <ValorantButton onClick={() => {
+                }}>{config.language.ATTACK}</ValorantButton>
+                <ValorantButton className="bg-emerald-400 w-[200px] h-[80px]" onClick={() => {
                   handleSidePick(false);
-                }}>Defense</ValorantButton> */}
+                }}>{config.language.DEFENSE}</ValorantButton>
+              </div>
             </>
             :
             <>
               <div className="mt-6 mb-8 flex justify-center">
                 <span className="text-3xl text-gray-300">{ config.schedule[game!.state].event === Events.BAN ? <>
-                  Ban a map
+                  {config.language.BAN_IMPERATIVE}
                 </> : <>
-                  Pick a map
+                  {config.language.PICK_IMPERATIVE}
                 </> }</span>
               </div>
               <div className="mb-6">
@@ -498,7 +510,7 @@ export default () => {
     </div>
     <div className="fixed bottom-0 w-full h-[50px] bg-red-400 flex justify-center items-center">
       <span className="text-md select-none">
-        STREAMERCUP CHAPTER III - ONETAP
+        {config.language.FOOTER}
       </span>
     </div>
   </>

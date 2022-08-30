@@ -12,7 +12,14 @@ const lang_en: any = {
   START_GAME: 'START GAME',
   DELETE: 'DELETE',
   NEW_GAME: 'NEW GAME',
-  CREATE: 'CREATE'
+  CREATE: 'CREATE',
+  NEXT_MAP: 'Map {number} will be {map}.',
+  BAN_IMPERATIVE: 'Ban a map',
+  PICk_IMPERATIVE: 'Pick a map',
+  PICK_SIDE_IMPERATIVE: 'Do you want to start on attacker or defender side on this map?',
+  ATTACK: 'ATTACK',
+  DEFENSE: 'DEFENSE',
+  FOOTER: 'STREAMERCUP CHAPTER III - ONETAP'
 }
 
 lang_en.statusMsg[Events.WAIT_START] = 'WAITING FOR GAME TO START'
