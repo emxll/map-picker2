@@ -1,8 +1,6 @@
 .map-frame {
   border-top: 1px solid rgb(209 213 219);
   border-bottom: 1px solid rgba(209, 213, 219, 0.7);
-  margin-right: 20px;
-  margin-left: 20px;
 }
 
 .top-sign {
@@ -23,8 +21,34 @@
   background-color: rgba(209, 213, 219, 0.7);
 }
 
+.top-details {
+  width: 30px;
+  left: calc(50% - (30px/2) );
+
+  background-color: rgb(209, 213, 219);
+}
+
 .inset-shadows {
-  box-shadow: inset 0px 0px 5px rgba(0,0,0,0.4);
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.4);
+}
+
+.small-map-frame {
+  border-top: 1px solid rgb(209 213 219);
+  border-bottom: 1px solid rgba(209, 213, 219, 0.7);
+}
+
+.small-map-frame-glow {
+  transition: box-shadow 0.3s ease;
+  transition: background-color 0.3s ease;
+}
+
+.small-map-frame:hover > .small-map-frame-glow {
+  box-shadow: inset 0px 0px 30px rgba(255, 229, 165, 0.2);
+  background-color: rgba(255, 255, 255, 0.1)
+}
+
+.small-map-frame-label {
+  color: rgba(209, 213, 219, 0.7);
 }
 
 .dialog {
@@ -32,3 +56,32 @@
   border-top: 1px solid rgb(209 213 219);
   border-bottom: 1px solid rgba(209, 213, 219, 0.7);
 }
+
+.button-overlay {
+  border: 3px solid;
+  border-color: rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease-out;
+  transition: border-color 0.3s ease-out;
+  box-sizing: content-box;
+  top: -3px;
+  left: -3px;
+}
+
+.button-corners-container:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: hsla(55, 80%, 70%, 0.85);
+}
+
+.button-corners-container {
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
+  top: -3px;
+  left: -3px;
+}
+
+.button-corners {
+  width: 3px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
