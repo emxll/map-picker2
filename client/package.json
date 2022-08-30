@@ -11,6 +11,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.9",
     "@heroicons/react": "^1.0.6",
+    "@types/string-template": "^1.0.2",
     "@types/ws": "^8.5.3",
     "autoprefixer": "^10.4.8",
     "graphql": "^16.6.0",
@@ -19,6 +20,7 @@
     "postcss": "^8.4.16",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "string-template": "^1.0.0",
     "tailwindcss": "^3.1.8",
     "ws": "^8.8.1"
   },

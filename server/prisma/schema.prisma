@@ -15,7 +15,7 @@ generator client {
 model Game {
   id    Int    @id @default(autoincrement())
   name  String @db.VarChar(80)
-  state Int    @default(-1)
+  state Int    @default(0)
   team0 String @db.VarChar(30)
   team1 String @db.VarChar(30)
   key0  String @db.VarChar(32)

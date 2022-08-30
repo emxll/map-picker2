@@ -1,0 +1,34 @@
+.map-frame {
+  border-top: 1px solid rgb(209 213 219);
+  border-bottom: 1px solid rgba(209, 213, 219, 0.7);
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.top-sign {
+  
+                      /* sin(rotation angle) */
+  transform: perspective(calc(60px)) rotateX(-10deg);
+  border-left: 1px solid rgb(209 213 219);
+  border-right: 1px solid rgb(209 213 219);
+  top: 2px;
+}
+
+.top-bar {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  height: 60px;
+}
+
+.details {
+  background-color: rgba(209, 213, 219, 0.7);
+}
+
+.inset-shadows {
+  box-shadow: inset 0px 0px 5px rgba(0,0,0,0.4);
+}
+
+.dialog {
+  background-color: rgba(13, 40, 66, 0.9);
+  border-top: 1px solid rgb(209 213 219);
+  border-bottom: 1px solid rgba(209, 213, 219, 0.7);
+}

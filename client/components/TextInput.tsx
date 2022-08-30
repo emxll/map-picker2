@@ -11,7 +11,7 @@ const TextInput: React.FunctionComponent<{
     type={hidden ? 'password': ''}
     value={value}
     onChange={onChange}
-    className={`border-2 border-gray-200 rounded text-gray-700 leading-tight focus:outline-none transition-colors ease-in-out duration-300 ${className}`}
+    className={`border-2 border-gray-200 rounded text-gray-700 leading-tight focus:outline-none transition-colors ease-in-out duration-300 ${!className ? '' : className}`}
   ></input>
 }
 

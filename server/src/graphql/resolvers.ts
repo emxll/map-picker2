@@ -200,15 +200,18 @@ export const resolvers = {
 
 
       if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
-      if(game.state !== -1) throw new ApolloError('This game has already started.', 'BAD_REQUEST');
+      if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
+      if(config.schedule[game.state].event !== Events.WAIT_START) throw new ApolloError('This game has already started.', 'BAD_REQUEST');
+
+      game.state += 1;
 
       const updatedGame = await prisma.game.update({
         where: {
           id: gameId
         },
         data: {
-          state: 0
+          state: game.state
         },
         include: {
           bans: {
@@ -253,7 +256,6 @@ export const resolvers = {
       });
 
       if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
-      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
       if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
       let team = teamAuth(game, auth);
@@ -333,7 +335,6 @@ export const resolvers = {
       });
 
       if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
-      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
       if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
 
@@ -418,7 +419,6 @@ export const resolvers = {
       });
 
       if(game === null) throw new ApolloError('Not found.','NOT_FOUND');
-      if(game.state === -1) throw new ApolloError('This game hasn\'t started.', 'BAD_REQUEST');
       if(game.state >= config.schedule.length) throw new ApolloError('This game is over.', 'BAD_REQUEST');
 
       let team = teamAuth(game, auth);

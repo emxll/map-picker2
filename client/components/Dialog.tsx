@@ -26,7 +26,7 @@ const Dialog: React.FunctionComponent<{
         + ( isOpen ? '' : 'scale-0' )
       }
       >
-        <div ref={dialogRef} className={`pointer-events-auto flex ${className}`}>
+        <div ref={dialogRef} className={`pointer-events-auto flex ${!className ? '' : className}`}>
           {children}
         </div>
       </div>

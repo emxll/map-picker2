@@ -1,8 +1,10 @@
 const Events = {
-  BAN: 0,
-  PICK: 1,
-  PICK_SIDE: 2,
-  RANDOM: 3
+  WAIT_START: 0,
+  BAN: 1,
+  PICK: 2,
+  PICK_SIDE: 3,
+  RANDOM: 4,
+  OVER: 5
 }
 
 export { Events }

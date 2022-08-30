@@ -1,7 +1,12 @@
 import { Events } from "./constants"
+import { lang_en } from "./utils/lang"
 
 const config = {
   schedule: [
+    {
+      event: Events.WAIT_START,
+      team: -1//for typesafety
+    },
     {
       event: Events.BAN,
       team: 0
@@ -30,6 +35,10 @@ const config = {
       event: Events.RANDOM,
       team: -1 //for typesafety
     },
+    {
+      event: Events.OVER,
+      team: -1
+    }
   ],
   pickedMapCount: 3,
   bannedMapCount: 2,
@@ -54,7 +63,8 @@ const config = {
     'https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltd0a2437fb09ebde4/62a2805b58931557ed9f7c9e/PearlLoadingScreen_MapFeaturedImage_930x522.png'
   ],
   graphqlUri: 'http://localhost:3002/api/graphql',
-  graphqlWsUri: 'ws://localhost:3002/api/graphql'
+  graphqlWsUri: 'ws://localhost:3002/api/graphql',
+  language: lang_en
 }
 
 export { config }

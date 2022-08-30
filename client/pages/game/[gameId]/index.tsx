@@ -10,6 +10,9 @@ import { AuthContext, Auth } from "../../_app";
 import { Dialog } from "../../../components/Dialog";
 import Head from "next/head";
 
+import styles from '../../../styles/Game.module.css'
+import { getStatusMsg } from "../../../utils/lang";
+
 export default () => {
 
   const [auth, setAuth] = useContext(AuthContext);
@@ -22,6 +25,7 @@ export default () => {
 
   const [team, setTeam] = useState<number | null>(null);
   const [key, setKey] = useState<String | undefined>();
+  const [statusText, setStatusText] = useState('');
 
   const [activeMaps, setActiveMaps] = useState<Array<Boolean>>(Array<Boolean>(8).fill(false))
 
@@ -34,9 +38,8 @@ export default () => {
     if(
       !game 
       || team === null 
-      || game.state === -1 
-      || game.state >= config.schedule.length
       || config.schedule[game.state].team !== team 
+      || [Events.WAIT_START, Events.RANDOM, Events.OVER].includes(config.schedule[game.state].event)
     ){
       setActiveMaps(active); 
       setIsDialogOpen(false);
@@ -63,6 +66,11 @@ export default () => {
     }
     setActiveMaps(active);
     setIsDialogOpen(true);
+  }
+
+  function getNewStatusMsg(){
+    if(!game) return;
+    setStatusText(getStatusMsg(game, config.language));
   }
 
   function handleMapClick(mapIdx: number){
@@ -131,6 +139,7 @@ export default () => {
 
   useEffect(() => {
     getNewState();
+    getNewStatusMsg();
   }, [game])
 
   //setup
@@ -224,28 +233,67 @@ export default () => {
 
   }, [ router.isReady]);
 
+  const SmallMapFrame: React.FC<{src: string, alt: string, onClick: MouseEventHandler<HTMLDivElement>}> = ({src, alt, onClick}) => {
+    return <div 
+      className="flex" 
+      style={{
+        width: "15vw",
+        aspectRatio: "16/9",
+        position: 'relative'
+      }}
+      onClick={onClick}
+    >
+      <Image
+        layout="fill"
+        objectFit="contain"
+        src={src}
+        alt={alt}
+      ></Image>
+    </div>
+  }
+
+  const MapFrame: React.FC<{src: string, alt: string, empty: boolean, width: string}> = ({src, alt, empty, width}) => {
+    return <div className={`relative ${styles['map-frame']}`}>
+      <div 
+        className={`absolute ${styles['inset-shadows']}`}
+        style={{
+          width: width,
+          aspectRatio: "16/9"
+        }}
+      ></div>
+      <div 
+        className="flex"
+        style={{
+          width: width,
+          aspectRatio: "16/9"
+        }}
+      >
+        { !empty &&
+          <Image
+            layout="fill"
+            objectFit="contain"
+            src={src}
+            alt={alt}
+          ></Image>
+        }
+      </div>
+      <div className={`absolute w-[1px] h-20 bottom-2 left-[-0.25rem] ${styles['details']}`}></div>
+      <div className={`absolute w-[1px] h-20 top-2 right-[-0.25rem] ${styles['details']}`}></div>
+    </div>
+  }
+
   const MapRow: React.FC<{arr: Array<number>}> = ({arr}) => {
     return <> 
-      <div className="flex flex-row flex-wrap">
+      <div className="flex flex-row flex-wrap justify-around">
         {arr.map(mapIdx => 
-          <Fragment key={mapIdx}>
-            <div 
-              onClick={() => {
-                handleMapClick(mapIdx);
-              }}
-              className="flex" style={{
-                width: "20vw",
-                height: "20vh",
-                position: "relative"
-            }}>
-              <Image
-                src={config.mapUrls[mapIdx]}
-                alt={config.maps[mapIdx]}
-                layout="fill"
-                objectFit="contain"
-              ></Image>
-            </div>
-          </Fragment>
+          <SmallMapFrame 
+            key={mapIdx}
+            src={config.mapUrls[mapIdx]}
+            alt={config.maps[mapIdx]}
+            onClick={() => {
+              handleMapClick(mapIdx);
+            }}
+          />
         )}
       </div>
     </>
@@ -253,48 +301,39 @@ export default () => {
 
   const PickedMapRow: React.FC = () => {
     return <>{game &&
-        <div className="flex flex-row flex-wrap">
+        <div className="flex flex-row flex-wrap justify-center">
           {Array.from(Array(config.pickedMapCount).keys()).map(mapIdx => 
-            mapIdx < game.maps.length &&
-            <Fragment key={mapIdx}>
-              <div 
-                className="flex" style={{
-                  width: "20vw",
-                  height: "20vh",
-                  position: "relative"
-              }}>
-                <Image
-                  src={config.mapUrls[game.maps[mapIdx].map]}
-                  alt={config.maps[game.maps[mapIdx].map]}
-                  layout="fill"
-                  objectFit="contain"
-                ></Image>
-              </div>
-            </Fragment>
+            {
+              let map = game.maps[mapIdx] ? game.maps[mapIdx].map: 0;
+
+
+              return <MapFrame 
+                key={mapIdx}
+                src={config.mapUrls[map]}
+                alt={config.maps[map]}
+                empty={mapIdx >= game.maps.length}
+                width="30vw"
+              />
+            }
           )}
         </div>
       }</>
   }
   const BannedMapRow: React.FC = () => {
     return <>{game &&
-        <div className="flex flex-row flex-wrap">
+        <div className="flex flex-row flex-wrap justify-center">
           {Array.from(Array(config.bannedMapCount).keys()).map(banIdx => 
-            banIdx < game.bans.length &&
-            <Fragment key={banIdx}>
-              <div 
-                className="flex" style={{
-                  width: "20vw",
-                  height: "20vh",
-                  position: "relative"
-              }}>
-                <Image
-                  src={config.mapUrls[game.bans[banIdx].map]}
-                  alt={config.maps[game.bans[banIdx].map]}
-                  layout="fill"
-                  objectFit="contain"
-                ></Image>
-              </div>
-            </Fragment>
+            {
+              let map = game.bans[banIdx] ? game.bans[banIdx].map: 0;
+
+              return <MapFrame 
+                key={banIdx}
+                src={config.mapUrls[map]}
+                alt={config.maps[map]}
+                empty={banIdx >= game.bans.length}
+                width="20vw"
+              />
+            }
           )}
         </div>
       }</>
@@ -304,8 +343,9 @@ export default () => {
     <Head>
       <style>{`
         body {
-          background-image: url(/img/bg.png);
-          background-size: cover;
+          background-color: #0d2842;
+          //background-image: url(/img/bg.png);
+          //background-size: 100% auto;
 
         }
         `}</style>
@@ -313,34 +353,69 @@ export default () => {
     <Dialog isOpen={isDialogOpen} toClose={() => {}}>
       {isDialogOpen && 
 
-        <div className="w-[80vw] h-[80vh] bg-white">
-        {
-          config.schedule[game!.state].event === Events.PICK_SIDE ? 
-          <>
-              <p>Map {game!.maps.length } will be {config.maps[game!.maps[game!.maps.length - 1].map]}.</p>
-              <p>Do you want to start on attacker or defender side on this map?</p>
-              <button onClick={() => {
-                handleSidePick(true);
-              }}>Attack</button>
-              <button onClick={() => {
-                handleSidePick(false);
-              }}>Defense</button>
-          </>
-          :
-          <>
-            { config.schedule[game!.state].event === Events.BAN ? <>
-              Ban a map
-            </> : <>
-              Pick a map
-            </> }
-            <MapRow arr={[0,1,2,3]}></MapRow>
-            <MapRow arr={[4,5,6,7]}></MapRow>
-          </>
-        }
+        <div className={`w-[80vw] h-[80vh] ${styles['dialog']}`}>
+          {
+            config.schedule[game!.state].event === Events.PICK_SIDE ? 
+            <>
+                <p>Map {game!.maps.length } will be {config.maps[game!.maps[game!.maps.length - 1].map]}.</p>
+                <p>Do you want to start on attacker or defender side on this map?</p>
+                <button onClick={() => {
+                  handleSidePick(true);
+                }}>Attack</button>
+                <button onClick={() => {
+                  handleSidePick(false);
+                }}>Defense</button>
+            </>
+            :
+            <>
+              <span>{ config.schedule[game!.state].event === Events.BAN ? <>
+                Ban a map
+              </> : <>
+                Pick a map
+              </> }</span>
+              <MapRow arr={[0,1,2,3]}></MapRow>
+              <MapRow arr={[4,5,6,7]}></MapRow>
+            </>
+          }
+          <div className={`w-[10px] h-[4px] bottom-0 left-0 ${styles['details']}`}></div>
         </div>
       }
     </Dialog>
-    <PickedMapRow></PickedMapRow>
-    <BannedMapRow></BannedMapRow>
+    <div className="flex flex-col h-screen">
+      <div className={`relative w-full border-b-[1px] border-gray-300 ${styles['top-bar']}`}>
+        <div className="absolute w-full h-[60px] flex justify-center">
+          <div className={`relative h-full flex flex-row ${styles['top-sign']}`}>
+            <div className="bg-gray-300 w-[20rem] h-full mx-[20px]">
+            </div>
+          </div>
+        </div>
+        <div className="absolute w-full h-full flex justify-center">
+          <div className="flex flex-col justify-center">
+            <span className="text-lg font-semibold select-none">
+              MAP PICKER
+            </span>
+          </div>
+        </div>
+        <div className="absolute h-full flex flex-col justify-center">
+          <span className="ml-[10px] text-md font-medium select-none text-gray-300">
+            {statusText}
+          </span>
+        </div>
+      </div>
+      <div className="flex-grow flex flex-col justify-around">
+        <div>
+          <PickedMapRow></PickedMapRow>
+        </div>
+        <div>
+          <BannedMapRow></BannedMapRow>
+        </div>
+      </div>
+      <div className=" bottom-0 w-full h-[50px]"></div>
+    </div>
+    <div className="fixed bottom-0 w-full h-[50px] bg-red-400 flex justify-center items-center">
+      <span className="text-md select-none">
+        STREAMERCUP CHAPTER III - ONETAP
+      </span>
+    </div>
   </>
 }

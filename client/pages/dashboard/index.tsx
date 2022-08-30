@@ -9,6 +9,7 @@ import { CGame } from "../../utils/types"
 import { gql } from "@apollo/client"
 import { useRouter } from "next/router"
 import client from "../../apollo-client"
+import { Events } from "../../constants"
 
 export default () => {
 
@@ -162,7 +163,7 @@ export default () => {
               <div className="flex flex-row flex-wrap">
                 {
                   games[focusedGameIndex].bans.length === 0 ? (
-                    <span className="text-gray-400">No maps have been banned yet.</span>
+                    <span className="text-gray-400">{config.language.NO_BANS}</span>
                   ) : (
                     games[focusedGameIndex].bans.map(ban => {
                       return (
@@ -192,7 +193,7 @@ export default () => {
               <div className="flex flex-row flex-wrap">
                 {
                   games[focusedGameIndex].maps.length === 0 ? (
-                    <span className="text-gray-400">No maps have been picked yet.</span>
+                    <span className="text-gray-400">{config.language.NO_MAPS}</span>
                   ) : (
                     games[focusedGameIndex].maps.map(map => {
                       return (
@@ -217,7 +218,7 @@ export default () => {
                                   <>
                                                                 {/* this sucks but its not my fault the icons are dog */}
                                     <ChipIcon className="h-5 w-5 mt-[0.1rem] mx-2 text-gray-400"></ChipIcon>
-                                      <span className="text-gray-500">Random choice</span>
+                                      <span className="text-gray-500">{config.language.RANDOM_CHOICE}</span>
                                   </>
                                 ) : (
                                   <>
@@ -263,7 +264,7 @@ export default () => {
             </div>
             <div className="self-end flex flex-row w-full">
               {
-                games[focusedGameIndex].state === -1 &&
+                config.schedule[games[focusedGameIndex].state].event === Events.WAIT_START &&
                 <>
                   <Button 
                     className="w-full mt-2 p-4 border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md"
@@ -279,7 +280,7 @@ export default () => {
                         }
                       })
                     }}
-                  >START GAME</Button>
+                  >{config.language.START_GAME}</Button>
                   <div className="p-1"></div>
                 </>
               }
@@ -298,7 +299,7 @@ export default () => {
                     }).then(() => setGameDialogOpen(false)).catch((e) => {console.error(e); router.push('/login')})
                     
                   }}
-                >DELETE</Button>
+                >{config.language.DELETE}</Button>
             </div>
           </div>
         }
@@ -342,7 +343,7 @@ export default () => {
               :
               (
                 <div>
-                  <span>No matches?</span>
+                  <span>{config.language.NO_MATCHES}</span>
                 </div>
               )}
 
@@ -351,7 +352,7 @@ export default () => {
             <Button 
               className="w-full p-4 border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md"
               onClick={(e) => { setCreateGameDialogOpen(true) }}
-            >NEW GAME</Button>
+            >{config.language.NEW_GAME}</Button>
           </div>
         </div>
       </div>

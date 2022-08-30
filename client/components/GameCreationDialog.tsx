@@ -2,6 +2,7 @@ import { gql } from "@apollo/client"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import client from "../apollo-client"
+import { config } from "../config"
 import { Button } from "./Button"
 import { Dialog } from "./Dialog"
 import { TextInput } from "./TextInput"
@@ -125,7 +126,7 @@ const GameCreationDialog: React.FC<{
             
           }}
           className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'
-        >CREATE</Button>
+        >{config.language.CREATE}</Button>
       </form>
     </Dialog>
   )

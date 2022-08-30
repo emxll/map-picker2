@@ -5,6 +5,10 @@ const config = {
   randomMapTimeout: 3000,
   schedule: [
     {
+      event: Events.WAIT_START,
+      team: -1//for typesafety
+    },
+    {
       event: Events.BAN,
       team: 0
     },
@@ -13,7 +17,7 @@ const config = {
       team: 1
     },
     {
-      event: Events.PICK,
+      event: Events.PICK,  //Events.PICK must be followed by Events.PICK_SIDE, the app cannot handle anything else.
       team: 0
     },
     {
@@ -30,8 +34,12 @@ const config = {
     },
     {
       event: Events.RANDOM,
-      team: 0
+      team: -1 //for typesafety
     },
+    {
+      event: Events.OVER,
+      team: -1
+    }
   ],
   maps: [
     'Bind',
