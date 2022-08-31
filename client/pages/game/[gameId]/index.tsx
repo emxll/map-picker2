@@ -9,7 +9,7 @@ import { Dialog } from "../../../components/Dialog";
 import Head from "next/head";
 
 import styles from '../../../styles/Game.module.css'
-import { getStatusMsg } from "../../../utils/lang";
+import { getStatusMsg, languages } from "../../../utils/lang";
 import format from "string-template";
 import { Auth, AuthContext } from "../../_app";
 
@@ -19,10 +19,9 @@ export default () => {
   const client = useApolloClient();
 
   const [auth, setAuth] = useContext(AuthContext);
-
   const [game, setGame] = useState<CGame | null>(null);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [lang, setLang] = useState(config.language);
 
   const router = useRouter();
 
@@ -73,7 +72,7 @@ export default () => {
 
   function getNewStatusMsg(){
     if(!game) return;
-    setStatusText(getStatusMsg(game, config.language));
+    setStatusText(getStatusMsg(game, lang));
   }
 
   function handleMapClick(mapIdx: number){
@@ -153,6 +152,13 @@ export default () => {
 
     if(!router.isReady) return;
     if(hasInitialized.current) return;
+
+    if( router.query.lang){
+      let _lang = router.query.lang?.toString();
+      if(Object.keys(languages).includes(_lang)){
+        setLang((languages as any)[_lang]);
+      }
+    }
     
     let gameId = parseInt(router.query.gameId as string, 10);
     if (isNaN(gameId)) {router.push('/'); return;}
@@ -311,7 +317,7 @@ export default () => {
     }
 
     if(typeof pickedBy !== 'undefined'){
-      if(pickedBy === -1) pickTeam = config.language.RANDOM_CHOICE
+      if(pickedBy === -1) pickTeam = lang.RANDOM_CHOICE
       else pickTeam = pickedBy === 0 ? game!.team0 : game!.team1 ;
     }
     
@@ -479,28 +485,28 @@ export default () => {
             config.schedule[game!.state].event === Events.PICK_SIDE ? 
             <>  
               <div className="mt-4 mb-8 text-gray-300 text-xl flex flex-col items-center">
-                <p>{format(config.language.NEXT_MAP, {
+                <p>{format(lang.NEXT_MAP, {
                   number: game!.maps.length,
                   map: config.maps[game!.maps[game!.maps.length - 1].map]
                 })}</p>
-                <p>{config.language.PICK_SIDE_IMPERATIVE}</p>
+                <p>{lang.PICK_SIDE_IMPERATIVE}</p>
               </div>
               <div className="mb-4 flex justify-evenly">
                 <ValorantButton className="bg-red-400 w-[200px] h-[80px]" onClick={() => {
                   handleSidePick(true);
-                }}>{config.language.ATTACK}</ValorantButton>
+                }}>{lang.ATTACK}</ValorantButton>
                 <ValorantButton className="bg-emerald-400 w-[200px] h-[80px]" onClick={() => {
                   handleSidePick(false);
-                }}>{config.language.DEFENSE}</ValorantButton>
+                }}>{lang.DEFENSE}</ValorantButton>
               </div>
             </>
             :
             <>
               <div className="mt-6 mb-8 flex justify-center">
                 <span className="text-3xl text-gray-300">{ config.schedule[game!.state].event === Events.BAN ? <>
-                  {config.language.BAN_IMPERATIVE}
+                  {lang.BAN_IMPERATIVE}
                 </> : <>
-                  {config.language.PICK_IMPERATIVE}
+                  {lang.PICK_IMPERATIVE}
                 </> }</span>
               </div>
               <div className="mb-6">
@@ -604,7 +610,7 @@ export default () => {
     </div>
     <div className="fixed bottom-0 w-full h-[50px] bg-red-400 flex justify-center items-center">
       <span className="text-md select-none">
-        {config.language.FOOTER}
+        {lang.FOOTER}
       </span>
     </div>
   </>

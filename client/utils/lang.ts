@@ -81,4 +81,9 @@ function getStatusMsg(game: CGame, lang: any){
 
 }
 
-export {lang_en, lang_de, getStatusMsg}
+const languages = {
+  en: lang_en,
+  de: lang_de
+}
+
+export {languages, getStatusMsg}
