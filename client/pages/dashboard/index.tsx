@@ -2,16 +2,20 @@ import { NextPage } from "next"
 import { Button } from "../../components/Button"
 import { ChipIcon, DotsVerticalIcon, FireIcon, MailOpenIcon, UserGroupIcon } from '@heroicons/react/solid'
 import { Dialog } from "../../components/Dialog"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { config } from "../../config"
 import { GameCreationDialog } from "../../components/GameCreationDialog"
 import { CGame } from "../../utils/types"
-import { gql } from "@apollo/client"
+import { gql, useApolloClient } from "@apollo/client"
 import { useRouter } from "next/router"
-import client from "../../apollo-client"
 import { Events } from "../../constants"
+import { AuthContext } from "../_app"
 
 export default () => {
+
+  const client = useApolloClient();
+
+  const [auth, setAuth] = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -48,9 +52,14 @@ export default () => {
             }
           }
         }
-      `
+      `,
+      context: {
+        headers: {
+          authorization: `Password ${auth.password}`
+        }
+      }
     }).then(({data}) => setGames(data.games))
-    .catch(error => {console.error(error); router.push('/login')})
+    .catch(error => { router.push('/login')})
 
     const onDeleted = client.subscribe({
       query: gql`
@@ -277,6 +286,11 @@ export default () => {
                         `,
                         variables: {
                           gameId: games![focusedGameIndex].id
+                        },
+                        context: {
+                          headers: {
+                            authorization: `Password ${auth.password}`
+                          }
                         }
                       })
                     }}
@@ -295,8 +309,13 @@ export default () => {
                       `,
                       variables:{
                         gameId: games![focusedGameIndex].id
+                      },
+                      context: {
+                        headers: {
+                          authorization: `Password ${auth.password}`
+                        }
                       }
-                    }).then(() => setGameDialogOpen(false)).catch((e) => {console.error(e); router.push('/login')})
+                    }).then(() => setGameDialogOpen(false)).catch((e) => { router.push('/login')})
                     
                   }}
                 >{config.language.DELETE}</Button>

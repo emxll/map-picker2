@@ -4,35 +4,42 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { getMainDefinition } from "@apollo/client/utilities";
 import { isClient } from "./utils/global";
+import { useContext } from "react";
 
-var client = {}
+export function generateClient(auth: any){
 
-if(isClient){
-  const wsLink = new GraphQLWsLink(createClient({
-    url: config.graphqlWsUri,
-    //FIXME: auth for websockets!!!! connectionParams,
-  }));
+  var client = {};
 
-  const httpLink = new HttpLink({
-    uri: config.graphqlUri,
-  });
+  if(isClient){
+    const wsLink = new GraphQLWsLink(createClient({
+      url: config.graphqlWsUri,
+      connectionParams: () => {
+        return {
+          auth
+        }
+      }
+    }));
 
-  const splitLink = split(
-    ({ query }) => {
-      const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
-    },
-    wsLink,
-    httpLink,
-  );
+    const httpLink = new HttpLink({
+      uri: config.graphqlUri,
+    });
 
-  client = new ApolloClient({
-    link: splitLink,
-    cache: new InMemoryCache(),
-  });
+    const splitLink = split(
+      ({ query }) => {
+        const definition = getMainDefinition(query);
+        return (
+          definition.kind === 'OperationDefinition' &&
+          definition.operation === 'subscription'
+        );
+      },
+      wsLink,
+      httpLink,
+    );
+
+    client = new ApolloClient({
+      link: splitLink,
+      cache: new InMemoryCache(),
+    });
+  }
+  return client;
 }
-
-export default client as ApolloClient<InMemoryCache>;

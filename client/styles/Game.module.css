@@ -29,7 +29,7 @@
 }
 
 .inset-shadows {
-  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.4);
+  box-shadow: inset 0px 0px 15px rgba(0,0,0,0.4);
 }
 
 .small-map-frame {
@@ -52,7 +52,7 @@
 }
 
 .dialog {
-  background-color: rgba(13, 40, 66, 0.9);
+  background-color: #0e1824e6;
   border-top: 1px solid rgb(209 213 219);
   border-bottom: 1px solid rgba(209, 213, 219, 0.7);
 }
@@ -94,5 +94,37 @@
 
 .button-overlay:hover .button-corners {
   background-color: hsla(55, 80%, 70%, 0.85);
+}
 
+@keyframes wrap-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.bg-text-upper {
+  animation: wrap-left 60s linear 0s infinite;
+}
+
+@keyframes wrap-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.bg-text-lower {
+  animation: wrap-right 120s linear 0s infinite;
+}
+
+.bg-text {
+  transform: scaleY(1.2);
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: rgba(209, 213, 219, 0.1);
+  color: rgba(209, 213, 219, 0);
 }

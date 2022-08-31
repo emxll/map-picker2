@@ -97,9 +97,10 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
   // WebSocketServer start listening.
   const serverCleanup = useServer({ 
     schema,
-    //FIXME: auth for subscriptions
     context: (ctx) => {
-
+      return {
+        auth: ctx.connectionParams!.auth
+      }
     }
   }, wsServer);
 
@@ -123,18 +124,17 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     context: ({req, res}) => {
-      const cookies = getIncomingMsgCookies(req);
-      let authKey = '';
+      let [key, password] = ['',''];
       if(req.headers.authorization){
         let a = req.headers.authorization.split(' ');
-        if(a[1] && a[0] === 'Key') authKey = a[1]; 
+        if(a[1] && a[0] === 'Key') key = a[1]; 
+        if(a[1] && a[0] === 'Password') password = a[1]; 
       }
       return {
         auth: {
-          password: cookies.password,
-          authKey: authKey,
-        },
-        res: res
+          password,
+          key
+        }
       }
     }
   });

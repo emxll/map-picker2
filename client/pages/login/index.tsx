@@ -1,18 +1,22 @@
-import { gql } from '@apollo/client'
+import { gql, useApolloClient } from '@apollo/client'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import client from '../../apollo-client'
+import { useContext, useState } from 'react'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
+import { Auth, AuthContext } from '../_app'
 
 const Login: NextPage = () => {
+
+  const client = useApolloClient();
 
   const router = useRouter();
 
   const [password, setPassword] = useState('');
 
   const [error, setError] = useState('');
+
+  const [auth, setAuth] = useContext(AuthContext);
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
@@ -55,6 +59,7 @@ const Login: NextPage = () => {
                   }
                 });
                 if(res.data.login){
+                  setAuth((auth: Auth) => ({...auth, password}) );
                   router.push('/dashboard');
                 }
                 else {

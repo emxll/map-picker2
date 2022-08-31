@@ -1,13 +1,12 @@
-import express from 'express';
+
 
 export type Auth = {
   password: string,
-  authKey: string,
+  key: string,
 }
 
 export type Context = {
-  auth: Auth,
-  res: express.Response
+  auth: Auth
 }
 
 export type Game = {
