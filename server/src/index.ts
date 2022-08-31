@@ -151,7 +151,7 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
   });
 
   // Modified server startup
-  await new Promise<void>(resolve => httpServer.listen({ port: port }, resolve));
+  await new Promise<void>(resolve => httpServer.listen({ host: '127.0.0.1', port: port }, resolve));
   console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
 }
 
