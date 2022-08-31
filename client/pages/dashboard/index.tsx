@@ -268,6 +268,14 @@ export default () => {
                     </pre></span>
                   </div>
                 </div>
+                <div className="mt-[0.5rem] flex flex-row flex-wrap">
+                  <span className="pr-4">Spectate: </span>
+                  <div className="bg-gray-200 rounded-md mt-1">
+                    <span className="text-xs text-indigo-900"><pre className="p-1">
+                      {`${window.location.origin}/game/${games[focusedGameIndex].id}`}
+                    </pre></span>
+                  </div>
+                </div>
               </div>
               <div className="p-4"></div>
             </div>

@@ -1,8 +1,9 @@
-import { gql } from "@apollo/client"
+import { gql, useApolloClient } from "@apollo/client"
 import { useRouter } from "next/router"
-import { useState } from "react"
-import client from "../apollo-client"
+import { useContext, useState } from "react"
+import format from "string-template"
 import { config } from "../config"
+import { AuthContext } from "../pages/_app"
 import { Button } from "./Button"
 import { Dialog } from "./Dialog"
 import { TextInput } from "./TextInput"
@@ -11,6 +12,10 @@ const GameCreationDialog: React.FC<{
   isOpen: boolean,
   toClose: Function
 }> = ( {isOpen, toClose}) => {
+
+  const [auth, setAuth] = useContext(AuthContext);
+
+  const client = useApolloClient();
 
   const router = useRouter();
 
@@ -30,13 +35,13 @@ const GameCreationDialog: React.FC<{
     let re = text.match(/(?<=\s*)\S(.*\S)?(?=\s*)/)
 
     if(re === null){
-      setError(`Can't be empty!`, errorIndex);
+      setError(config.language.NO_EMPTY, errorIndex);
       return false;
     }
 
     let newText = re[0];
     if(newText.length > maxLen){
-      setError(`Can't be longer than ${maxLen} characters!`, errorIndex);
+      setError(format(config.language.TOO_LONG, {maxLen}), errorIndex);
       return false;
     }
 
@@ -57,12 +62,12 @@ const GameCreationDialog: React.FC<{
         className="flex flex-col p-6 w-full"
       >
         <div className="flex-row justify-center">
-          <h2 className='text-3xl text-center font-bold text-gray-600 select-none'>Create a new game</h2>
+          <h2 className='text-3xl text-center font-bold text-gray-600 select-none'>{config.language.CREATE_IMPERATIVE}</h2>
         </div>
 
         <div className="p-2"></div>
 
-        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>NAME</span>
+        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>{config.language.NAME}</span>
         <div className='p-1'></div>
         <TextInput
           className="bg-gray-100 w-full p-3 text-lg focus:border-emerald-300 drop-shadow-md"
@@ -73,7 +78,7 @@ const GameCreationDialog: React.FC<{
 
         <div className="p-2"></div>
 
-        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>TEAM 1</span>
+        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>{format(config.language.TEAM, {number: 1})}</span>
         <div className='p-1'></div>
         <TextInput 
           className="bg-gray-100 w-full p-3 text-lg focus:border-emerald-300 drop-shadow-md"
@@ -84,7 +89,7 @@ const GameCreationDialog: React.FC<{
 
         <div className="p-2"></div>
 
-        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>TEAM 2</span>
+        <span className='w-full text-sm font-extrabold text-gray-500 select-none'>{format(config.language.TEAM, {number: 2})}</span>
         <div className='p-1'></div>
         <TextInput 
           className="bg-gray-100 w-full p-3 text-lg focus:border-emerald-300 drop-shadow-md"
@@ -116,13 +121,18 @@ const GameCreationDialog: React.FC<{
                 name,
                 team0,
                 team1
+              },
+              context: {
+                headers: {
+                  authorization: `Password ${auth.password}`
+                }
               }
             }).then(() => {
               toClose()
               setName('');
               setTeam0('');
               setTeam1('');
-            }).catch(e => {console.error(e); router.push('/login')});
+            }).catch((e:any) => {console.error(e); router.push('/login')});
             
           }}
           className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'

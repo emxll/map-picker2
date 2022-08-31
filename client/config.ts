@@ -1,5 +1,5 @@
 import { Events } from "./constants"
-import { lang_en } from "./utils/lang"
+import { lang_de, lang_en } from "./utils/lang"
 
 const config = {
   schedule: [
@@ -64,7 +64,7 @@ const config = {
   ],
   graphqlUri: 'http://localhost:3002/api/graphql',
   graphqlWsUri: 'ws://localhost:3002/api/graphql',
-  language: lang_en
+  language: lang_de
 }
 
 export { config }

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useContext, useState } from 'react'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
+import { config } from '../../config'
 import { Auth, AuthContext } from '../_app'
 
 const Login: NextPage = () => {
@@ -20,14 +21,14 @@ const Login: NextPage = () => {
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
-      <h2 className='text-3xl font-bold text-gray-600 drop-shadow select-none'>Hey there!</h2>
+      <h2 className='text-3xl font-bold text-gray-600 drop-shadow select-none'>{config.language.GREETING}</h2>
       <div className='p-3'></div>
       <div className='border-2 border-gray-100 bg-white rounded-lg drop-shadow-xl'>
         <form
           onSubmit={e => e.preventDefault()}
           className='p-8 flex flex-col justify-center items-center h-full min-w-[400px] w-[500px]'>
 
-            <span className='w-full text-sm font-extrabold text-gray-500 select-none'>PASSWORD</span>
+            <span className='w-full text-sm font-extrabold text-gray-500 select-none'>{config.language.PASSWORD}</span>
 
             <div className='p-2'></div>
 
@@ -63,7 +64,7 @@ const Login: NextPage = () => {
                   router.push('/dashboard');
                 }
                 else {
-                  setError('Password incorrect!');
+                  setError(config.language.PASSWORD_INCORRECT);
                 }
               }}
               className='w-full p-3 text-md border-2 border-emerald-200 bg-emerald-300 active:bg-emerald-400 drop-shadow-md'
