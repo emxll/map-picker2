@@ -8,6 +8,7 @@ import { useContext } from "react";
 
 export function generateClient(auth: any){
 
+
   var client = {};
 
   if(isClient){
@@ -40,6 +41,9 @@ export function generateClient(auth: any){
       link: splitLink,
       cache: new InMemoryCache(),
     });
+
+    //I'm not sorry
+    (client as any).auth = auth;
   }
   return client;
 }

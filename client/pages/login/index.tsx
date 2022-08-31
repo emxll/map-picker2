@@ -5,6 +5,7 @@ import { useContext, useState } from 'react'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
 import { config } from '../../config'
+import { setCookie } from '../../utils/cookie'
 import { Auth, AuthContext } from '../_app'
 
 const Login: NextPage = () => {
@@ -61,6 +62,7 @@ const Login: NextPage = () => {
                 });
                 if(res.data.login){
                   setAuth((auth: Auth) => ({...auth, password}) );
+                  setCookie('password', password, 7);
                   router.push('/dashboard');
                 }
                 else {

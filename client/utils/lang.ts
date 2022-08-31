@@ -28,6 +28,7 @@ const lang_en: any = {
   CREATE_IMPERATIVE: 'Create a new game',
   NAME: 'NAME',
   TEAM: 'TEAM {number}',
+  SPECTATE: 'Spectate'
 
 }
 
@@ -63,6 +64,7 @@ const lang_de: any = {
   CREATE_IMPERATIVE: 'Erstelle ein neues Spiel',
   NAME: 'NAME',
   TEAM: 'TEAM {number}',
+  SPECTATE: 'Zuschauer'
 }
 
 lang_de.statusMsg[Events.WAIT_START] = 'WARTEN BIS DAS VOTING BEGINNT'

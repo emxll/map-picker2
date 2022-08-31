@@ -23,14 +23,6 @@ export function getCookie(cname: string) {
   return "";
 }
 
-export function getAuthCookie(){
-  return getCookie('auth');
-}
-
-export function setAuthCookie(authStr: string){
-  return setCookie('auth', authStr, 9999999);
-}
-
 export function getIncomingMsgCookies(msg: IncomingMessage){
   const cookies: any = {};
   if(msg.headers.cookie){ 

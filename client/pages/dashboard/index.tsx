@@ -2,24 +2,26 @@ import { NextPage } from "next"
 import { Button } from "../../components/Button"
 import { ChipIcon, DotsVerticalIcon, FireIcon, MailOpenIcon, UserGroupIcon } from '@heroicons/react/solid'
 import { Dialog } from "../../components/Dialog"
-import { useCallback, useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { config } from "../../config"
 import { GameCreationDialog } from "../../components/GameCreationDialog"
 import { CGame } from "../../utils/types"
 import { gql, useApolloClient } from "@apollo/client"
 import { useRouter } from "next/router"
 import { Events } from "../../constants"
-import { AuthContext } from "../_app"
+import { Auth, AuthContext } from "../_app"
+import { getCookie } from "../../utils/cookie"
 
 export default () => {
 
   const client = useApolloClient();
 
   const [auth, setAuth] = useContext(AuthContext);
+  const hasInitialized = useRef(false);
 
   const router = useRouter();
 
-  let [ games, setGames]  = useState<Array<CGame>>([]);
+  let [ games, setGames ]  = useState<Array<CGame>>([]);
 
   const [focusedGameIndex, setFocusedGameIndex] = useState(0);
 
@@ -27,7 +29,17 @@ export default () => {
 
   const [isCreateGameDialogOpen, setCreateGameDialogOpen] = useState(false);
 
+  //init
+  //well, this SHOULD re-render anytime the games change and that would break everything but contrary to every single bit 
+  //of documentation out there, it doesn't
   useEffect( () => {
+
+    if(!(client as any).auth.password){
+      let cookie = getCookie('password');
+      setAuth( (auth: Auth) => ({...auth, password: cookie}));
+      return;
+    }
+
     client.query({
       query: gql`
         query Games {
@@ -128,15 +140,13 @@ export default () => {
       setGames((games) => games.map((game) => game.id === data.gameUpdated.id ? data.gameUpdated : game));
     });
 
-
-
     return () => {
       onDeleted.unsubscribe();
       onCreated.unsubscribe();
       onUpdated.unsubscribe();
     }
 
-  }, [])
+  }, [client]);
 
   return (
     <>
@@ -269,7 +279,7 @@ export default () => {
                   </div>
                 </div>
                 <div className="mt-[0.5rem] flex flex-row flex-wrap">
-                  <span className="pr-4">Spectate: </span>
+                  <span className="pr-4">{config.language.SPECTATE}: </span>
                   <div className="bg-gray-200 rounded-md mt-1">
                     <span className="text-xs text-indigo-900"><pre className="p-1">
                       {`${window.location.origin}/game/${games[focusedGameIndex].id}`}

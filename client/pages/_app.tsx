@@ -1,8 +1,10 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { ApolloClient, ApolloProvider, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
+import { ApolloClient, ApolloProvider, NormalizedCacheObject } from '@apollo/client'
 import { createContext, useEffect, useRef, useState } from 'react';
 import { generateClient } from '../apollo-client';
+import useDeepCompareEffect from 'use-deep-compare-effect';
+
 
 export type Auth = {password: string | null, key: string | null};
 
@@ -32,9 +34,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const [ apolloClient, setApolloClient] = useState<ApolloClient<NormalizedCacheObject> | {}>(client);
 
-  useEffect( () => {
+  useDeepCompareEffect( () => {
+    console.log(JSON.stringify(auth));
     setApolloClient(generateClient(auth));
-  }, [auth])
+  }, [auth]);
 
   return <AuthContext.Provider value={[auth, setAuth]}>
     <ApolloProvider client={apolloClient as ApolloClient<NormalizedCacheObject>}>
