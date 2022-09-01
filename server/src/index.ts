@@ -121,7 +121,6 @@ async function startApolloServer(typeDefs: DocumentNode, resolvers: any) {
           };
         },
       },
-      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     context: ({req, res}) => {
       let [key, password] = ['',''];
