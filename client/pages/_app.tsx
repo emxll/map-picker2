@@ -4,6 +4,8 @@ import { ApolloClient, ApolloProvider, NormalizedCacheObject } from '@apollo/cli
 import { createContext, useEffect, useRef, useState } from 'react';
 import { generateClient } from '../apollo-client';
 import useDeepCompareEffect from 'use-deep-compare-effect';
+import Head from 'next/head';
+import Link from 'next/link';
 
 
 export type Auth = {password: string | null, key: string | null};

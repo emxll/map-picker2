@@ -11,6 +11,7 @@ import { useRouter } from "next/router"
 import { Events } from "../../constants"
 import { Auth, AuthContext } from "../_app"
 import { getCookie } from "../../utils/cookie"
+import Head from "next/head"
 
 export default () => {
 
@@ -154,6 +155,9 @@ export default () => {
 
   return (
     <>
+      <Head>
+        <title>Dashboard</title>
+      </Head>
       {/* <p>{games.map(game => game.state).join(',')}</p>
       <p>{focusedGameIndex}</p> */}
       <GameCreationDialog

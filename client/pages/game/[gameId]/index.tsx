@@ -468,6 +468,7 @@ export default () => {
 
   return <>
     <Head>
+      <title>Voting</title>
       <style>{`
         body {
           background-color: #0e1824;
