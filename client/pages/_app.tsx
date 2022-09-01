@@ -37,7 +37,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [ apolloClient, setApolloClient] = useState<ApolloClient<NormalizedCacheObject> | {}>(client);
 
   useDeepCompareEffect( () => {
-    console.log(JSON.stringify(auth));
     setApolloClient(generateClient(auth));
   }, [auth]);
 
