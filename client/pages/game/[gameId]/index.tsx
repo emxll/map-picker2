@@ -525,9 +525,9 @@ export default () => {
         </div>
       }
     </Dialog>
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden">
-      <div className={`relative w-full border-b-[1px] border-gray-300 ${styles['top-bar']}`}>
-        <div className="absolute w-full h-[60px] flex justify-center">
+    <div className="relative flex flex-col h-screen w-screen overflow-x-hidden">
+      <div className={`fixed w-full border-b-[1px] border-gray-300 ${styles['top-bar']}`}>
+        <div className="absolute w-full h-[5vh] flex justify-center">
           <div className={`relative h-full flex flex-row ${styles['top-sign']}`}>
             <div className="bg-gray-300 w-[20rem] h-full mx-[20px]">
             </div>
@@ -546,70 +546,73 @@ export default () => {
           </span>
         </div>
       </div>
-      <div className="flex-grow flex flex-col justify-around">
-        <div className="flex justify-center mt-6">
-          <span className="text-gray-300 text-xl font-bold">MAPS</span>
+      <div className="flex flex-col h-screen">
+        <div className="bottom-0 w-full h-[5vh]"></div>
+        <div className="flex-grow flex-shrink flex flex-col justify-evenly">
+          <div className="flex justify-center">
+            <span className="text-gray-300 text-xl font-bold">MAPS</span>
+          </div>
+          <div className="mb-2">
+            <PickedMapRow></PickedMapRow>
+          </div>
+          <div className="flex justify-center">
+            <span className="text-gray-300 text-xl font-bold">BANS</span>
+          </div>
+          <div className="mb-2">
+            <BannedMapRow></BannedMapRow>
+          </div>
         </div>
-        <div>
-          <PickedMapRow></PickedMapRow>
-        </div>
-        <div className="flex justify-center mt-6">
-          <span className="text-gray-300 text-xl font-bold">BANS</span>
-        </div>
-        <div className="mb-6">
-          <BannedMapRow></BannedMapRow>
-        </div>
+        <div className="bottom-0 w-full h-[5vh]  mt-6"></div>
       </div>
-      <div className="bottom-0 w-full h-[50px]"></div>
-      <div className="right-[10px] bottom-[70px] h-[10px] w-[10px] bg-red-400 absolute -z-10"></div>
-      <div className="right-[10px] bottom-[85px] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="right-[10px] bottom-[95px] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="right-[10px] bottom-[70px] h-[10px] w-[10px] bg-red-400 fixed -z-10"></div>
+      <div className="right-[10px] bottom-[85px] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="right-[10px] bottom-[95px] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="left-[20vw] h-screen w-[1px] bg-gray-300 opacity-20 absolute -z-10"></div>
-      <div className="top-[10vh] w-screen h-[1px] bg-gray-300 opacity-20 absolute -z-10"></div>
+      <div className="left-[20vw] h-screen w-[1px] bg-gray-300 opacity-20 fixed -z-10"></div>
+      <div className="top-[10vh] w-screen h-[1px] bg-gray-300 opacity-20 fixed -z-10"></div>
 
-      <div className="top-[49.5vh] left-[62vw] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[49.5vh] left-[calc(62vw+10px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[52vh] left-[62vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] left-[calc(62vw+10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="bottom-[38vh] left-[32.5vw] h-[6px] w-[30px] bg-red-400 absolute -z-10"></div>
+      <div className="bottom-[36vh] left-[32.5vw] h-[6px] w-[30px] bg-red-400 fixed -z-10"></div>
 
-      <div className="bottom-[38vh] right-[28vw] h-[4px] w-[30px] bg-red-400 absolute -z-10"></div>
-      <div className="bottom-[38vh] right-[calc(28vw-10px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="bottom-[38vh] right-[calc(28vw-20px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="bottom-[36vh] right-[28vw] h-[4px] w-[30px] bg-red-400 fixed -z-10"></div>
+      <div className="bottom-[36vh] right-[calc(28vw-10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="bottom-[36vh] right-[calc(28vw-20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
       
-      <div className="top-[37vh] left-[33vw] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[calc(37vh+10px)] left-[33vw] h-[40px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[37vh] left-[33vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[calc(37vh+10px)] left-[33vw] h-[40px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="top-[27vh] left-[0.5vw] h-[40px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[27vh] left-[10px] h-[40px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="top-[10vh] right-[5vw] w-[60px] h-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[10vh] right-[5vw] w-[60px] h-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="top-[49.5vh] right-[3vw] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[49.5vh] right-[calc(3vw+10px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[49.5vh] right-[calc(3vw+20px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[49.5vh] right-[calc(3vw+30px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[52vh] right-[3vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+30px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="left-[calc(20vw-10px)] top-[55vh] w-[10px] h-[60px] bg-red-400 absolute -z-10"></div>
+      <div className="left-[calc(20vw-10px)] top-[55vh] w-[10px] h-[60px] bg-red-400 fixed -z-10"></div>
 
-      <div className="top-[10vh] left-[40vw] w-[4px] h-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="top-[10vh] left-[calc(40vw+10px)] w-[4px] h-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="top-[10vh] left-[40vw] w-[4px] h-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[10vh] left-[calc(40vw+10px)] w-[4px] h-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className="left-[0.5vw] bottom-[28vh] h-[60px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="left-[0.5vw] bottom-[calc(28vh-10px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
-      <div className="left-[0.5vw] bottom-[calc(28vh-20px)] h-[4px] w-[4px] bg-red-400 absolute -z-10"></div>
+      <div className="left-[10px] bottom-[28vh] h-[60px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="left-[10px] bottom-[calc(28vh-10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="left-[10px] bottom-[calc(28vh-20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
 
-      <div className={`h-1/2 absolute -z-20 flex flex-nowrap justify-around ${styles['bg-text-upper']}`}>
+      <div className={`h-1/2 fixed -z-20 flex flex-nowrap justify-around ${styles['bg-text-upper']}`}>
         <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
         <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
       </div>
-      <div className={`h-1/2 absolute bottom-0 -z-20 flex flex-nowrap justify-around ${styles['bg-text-lower']}`}>
+      <div className={`h-1/2 fixed bottom-0 -z-20 flex flex-nowrap justify-around ${styles['bg-text-lower']}`}>
         <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
         <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
       </div>
 
 
     </div>
-    <div className="fixed bottom-0 w-full h-[50px] bg-red-400 flex justify-center items-center">
+    <div className="fixed bottom-0 w-full h-[5vh] bg-red-400 flex justify-center items-center">
       <span className="text-md select-none">
         {lang.FOOTER}
       </span>

@@ -6,7 +6,7 @@
 .top-sign {
   
                       /* sin(rotation angle) */
-  transform: perspective(calc(60px)) rotateX(-10deg);
+  transform: perspective(calc(5vh)) rotateX(-10deg);
   border-left: 1px solid rgb(209 213 219);
   border-right: 1px solid rgb(209 213 219);
   top: 2px;
@@ -14,7 +14,7 @@
 
 .top-bar {
   background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
-  height: 60px;
+  height: 5vh;
 }
 
 .details {
