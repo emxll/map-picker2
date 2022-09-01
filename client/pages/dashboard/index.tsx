@@ -36,6 +36,10 @@ export default () => {
 
     if(!(client as any).auth.password){
       let cookie = getCookie('password');
+      if(!cookie){
+        router.push('/login');
+        return;
+      }
       setAuth( (auth: Auth) => ({...auth, password: cookie}));
       return;
     }
