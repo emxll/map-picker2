@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: [
-      'images.contentstack.io'
+      'static.wikia.nocookie.net'
     ]
   }
 }

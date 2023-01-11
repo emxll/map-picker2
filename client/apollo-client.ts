@@ -8,7 +8,6 @@ import { useContext } from "react";
 
 export function generateClient(auth: any){
 
-
   var client = {};
 
   if(isClient){

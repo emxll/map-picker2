@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --vred: #fe4654;
+  --vblack: #101723;
+  --vwhite: #e8e7e5;
+  --vgreen: #47ffbc;
+  --vsky: #22d3ee;
+}
+
 html,
 body {
   padding: 0;

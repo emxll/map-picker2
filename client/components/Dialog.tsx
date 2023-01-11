@@ -18,12 +18,12 @@ const Dialog: React.FunctionComponent<{
   return (
     <>
       <div 
-        className={"transition-opacity ease-in-out duration-300 pointer-events-none fixed w-screen h-screen bg-black z-10 "
-        + (isOpen ? 'opacity-30' : 'opacity-0')}
+        className={"transition-opacity ease-in-out duration-300 pointer-events-none fixed w-screen h-screen bg-black"
+        + (isOpen ? ' opacity-30 ' : ' opacity-0 ')}
       ></div>
       <div 
-        className={"transition-transform ease-in-out duration-300 pointer-events-none fixed flex flex-col items-center justify-center w-screen h-screen z-10 "
-        + ( isOpen ? '' : 'scale-0' )
+        className={"transition-transform ease-in-out duration-300 pointer-events-none fixed flex flex-col items-center justify-center w-screen h-screen"
+        + ( isOpen ? '' : ' scale-0 ' )
       }
       >
         <div ref={dialogRef} className={`pointer-events-auto flex ${!className ? '' : className}`}>

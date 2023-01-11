@@ -322,10 +322,21 @@ export default () => {
     }
     
     return <div className="flex flex-col">
-      <div>
-        {empty ? <br/> : <span className="text-gray-300 opacity-40 select-none">// {alt}</span>}
-      </div>
-      <div className={`relative bg-[#0e1824] ${styles['map-frame']}`}>
+      <div className={`relative bg-vblack ${styles['map-frame']}`}>
+        <div className="absolute -z-10 w-full h-full shadow-[0_0_50px_20px_var(--vblack)]"></div>
+        <div className="absolute w-full top-[-1.5rem] text-gray-300">
+          <div className="relative w-full h-full flex flex-row items-center z-10">
+            <div className="h-[0.4rem] bg-vwhite shadow-[0_0_50px_1px_var(--vwhite)] flex-grow z-10"></div>
+            <div className="
+              flex flex-row justify-center items-center mx-[0.5rem] min-w-[5rem] h-[2rem] bg-vblack select-none relative
+              after:content-[''] after:w-full after:absolute after:h-[30%] after:border-vwhite after:border-[1px] after:border-b-0 after:border-opacity-50 after:top-0 after:z-10
+              before:content-[''] before:w-full before:absolute before:h-[30%] before:border-vwhite before:border-[1px] before:border-t-0 before:border-opacity-50 before:bottom-0 before:z-10
+            ">
+              <span className="">{alt}</span>
+            </div>
+            <div className="h-[0.4rem] bg-vwhite shadow-[0_0_50px_1px_var(--vwhite)] flex-grow z-10"></div>
+          </div>
+        </div>
         <div 
           className="flex relative"
           style={{
@@ -348,8 +359,17 @@ export default () => {
             aspectRatio: "16/9"
           }}
         ></div>
-        <div className={`absolute w-[1px] h-20 bottom-2 left-[-0.25rem] ${styles['details']}`}></div>
-        <div className={`absolute w-[1px] h-20 top-2 right-[-0.25rem] ${styles['details']}`}></div>
+        {typeof attacker !== 'undefined' && 
+          <div 
+            className={`absolute top-0 left-0 ${styles['attack-glow']}`}
+            style={{
+              width: width,
+              aspectRatio: "16/9"
+            }}
+          ></div>
+        }
+        {/* <div className="absolute w-full h-[0.4rem] top-[-0.6rem] left-0 bg-vwhite shadow-[0_0_50px_1px_var(--vwhite)]"></div> */}
+        <div className={`absolute w-[1px] h-20 bottom-2 right-[-0.25rem] ${styles['details']}`}></div>
         {typeof attacker !== 'undefined' && 
           <div 
             className={`absolute top-0 left-0 flex flex-col justify-between items-start`}
@@ -358,30 +378,20 @@ export default () => {
               aspectRatio: "16/9"
             }}
           >
-            <div className="relative mt-[10px] opacity-90 bg-red-400 left-[-1rem] flex justify-center items-center">
-              <span className="select-none m-2 text-xl font-semibold text-[#0e1824]">
+            <div className="relative mt-[10px] opacity-90 bg-vblack left-[-1rem] flex justify-center items-center">
+              <span className="select-none m-2 text-xl font-semibold text-vred">
                 {attTeam}
               </span>
-              <div className="absolute flex flex-col justify-between h-full w-full">
-                <div className="flex justify-end">
-                  <div className="bg-[#0e1824] h-[4px] w-[4px]"></div>
-                </div>
-                <div className="flex justify-start">
-                  <div className="bg-[#0e1824] w-[20px] h-[2px]"></div>
-                </div>
+              <div className="absolute flex h-full w-full">
+                <div className="bg-vred h-[100%] w-[2px] shadow-[0_0_20px_5px_var(--vred)]"></div>
               </div>
             </div>
-            <div className="relative mb-[10px] opacity-90 bg-emerald-400 left-[-1rem] flex justify-start items-center">
-              <span className="select-none m-2 text-xl font-semibold text-[#0e1824]">
+            <div className="relative mb-[10px] opacity-90 bg-vblack left-[-1rem] flex justify-start items-center">
+              <span className="select-none m-2 text-xl font-semibold text-vgreen">
                 {defTeam}
               </span>
-              <div className="absolute flex justify-between h-full w-full">
-                <div className="flex flex-col justify-start">
-                  <div className="bg-[#0e1824] h-[4px] w-[4px]"></div>
-                </div>
-                <div className="flex flex-col justify-end">
-                  <div className="bg-[#0e1824] h-[20px] w-[2px]"></div>
-                </div>
+              <div className="absolute flex h-full w-full">
+                <div className="bg-vgreen h-[100%] w-[2px] shadow-[0_0_20px_5px_var(--vgreen)]"></div>
               </div>
             </div>
           </div>
@@ -471,60 +481,62 @@ export default () => {
       <title>Voting</title>
       <style>{`
         body {
-          background-color: #0e1824;
+          background-color: #101723;
           //background-image: url(/img/bg.png);
           //background-size: 100% auto;
 
         }
         `}</style>
     </Head>
-    <Dialog isOpen={isDialogOpen} toClose={() => {}}>
-      {isDialogOpen && 
+    <div className="z-20 fixed">
+      <Dialog isOpen={isDialogOpen} toClose={() => {}}>
+        {isDialogOpen && 
 
-        <div className={`relative w-[80vw] ${styles['dialog']}`}>
-          {
-            config.schedule[game!.state].event === Events.PICK_SIDE ? 
-            <>  
-              <div className="mt-4 mb-8 text-gray-300 text-xl flex flex-col items-center">
-                <p>{format(lang.NEXT_MAP, {
-                  number: game!.maps.length,
-                  map: config.maps[game!.maps[game!.maps.length - 1].map]
-                })}</p>
-                <p>{lang.PICK_SIDE_IMPERATIVE}</p>
-              </div>
-              <div className="mb-4 flex justify-evenly">
-                <ValorantButton className="bg-red-400 w-[200px] h-[80px]" onClick={() => {
-                  handleSidePick(true);
-                }}>{lang.ATTACK}</ValorantButton>
-                <ValorantButton className="bg-emerald-400 w-[200px] h-[80px]" onClick={() => {
-                  handleSidePick(false);
-                }}>{lang.DEFENSE}</ValorantButton>
-              </div>
-            </>
-            :
-            <>
-              <div className="mt-6 mb-8 flex justify-center">
-                <span className="text-3xl text-gray-300">{ config.schedule[game!.state].event === Events.BAN ? <>
-                  {lang.BAN_IMPERATIVE}
-                </> : <>
-                  {lang.PICK_IMPERATIVE}
-                </> }</span>
-              </div>
-              <div className="mb-6">
-                <MapRow arr={[0,1,2,3]}></MapRow>
-              </div>
-              <div>
-                <MapRow arr={[4,5,6,7]}></MapRow>
-              </div>
-              <div className="h-12"></div>
-            </>
-          }
-          <div className={`absolute w-[10px] h-[4px] bottom-0 left-0 ${styles['details']}`}></div>
-          <div className={`absolute w-[10px] h-[4px] bottom-0 right-0 ${styles['details']}`}></div>
-          <div className={`absolute h-[5px] top-[-3px] ${styles['top-details']}`}></div>
-        </div>
-      }
-    </Dialog>
+          <div className={`relative w-[80vw] ${styles['dialog']}`}>
+            {
+              config.schedule[game!.state].event === Events.PICK_SIDE ? 
+              <>  
+                <div className="mt-4 mb-8 text-gray-300 text-xl flex flex-col items-center">
+                  <p>{format(lang.NEXT_MAP, {
+                    number: game!.maps.length,
+                    map: config.maps[game!.maps[game!.maps.length - 1].map]
+                  })}</p>
+                  <p>{lang.PICK_SIDE_IMPERATIVE}</p>
+                </div>
+                <div className="mb-4 flex justify-evenly">
+                  <ValorantButton className="bg-vred w-[200px] h-[80px]" onClick={() => {
+                    handleSidePick(true);
+                  }}>{lang.ATTACK}</ValorantButton>
+                  <ValorantButton className="bg-vgreen w-[200px] h-[80px]" onClick={() => {
+                    handleSidePick(false);
+                  }}>{lang.DEFENSE}</ValorantButton>
+                </div>
+              </>
+              :
+              <>
+                <div className="mt-6 mb-8 flex justify-center">
+                  <span className="text-3xl text-gray-300">{ config.schedule[game!.state].event === Events.BAN ? <>
+                    {lang.BAN_IMPERATIVE}
+                  </> : <>
+                    {lang.PICK_IMPERATIVE}
+                  </> }</span>
+                </div>
+                <div className="mb-6">
+                  <MapRow arr={[0,1,2,3]}></MapRow>
+                </div>
+                <div>
+                  <MapRow arr={[4,5,6,7]}></MapRow>
+                </div>
+                <div className="h-12"></div>
+              </>
+            }
+            <div className={`absolute w-[10px] h-[4px] bottom-0 left-0 ${styles['details']}`}></div>
+            <div className={`absolute w-[10px] h-[4px] bottom-0 right-0 ${styles['details']}`}></div>
+            <div className={`absolute h-[5px] top-[-3px] ${styles['top-details']}`}></div>
+          </div>
+        }
+      </Dialog>
+    </div>
     <div className="relative flex flex-col h-screen w-screen overflow-x-hidden">
       <div className={`fixed w-full border-b-[1px] border-gray-300 ${styles['top-bar']}`}>
         <div className="absolute w-full h-[5vh] flex justify-center">
@@ -535,13 +547,13 @@ export default () => {
         </div>
         <div className="absolute w-full h-full flex justify-center">
           <div className="flex flex-col justify-center">
-            <span className="text-lg font-semibold select-none">
+            <span className={`text-2xl select-none ${styles['v-anton']}`}>
               MAP VOTING
             </span>
           </div>
         </div>
         <div className="absolute h-full flex flex-col justify-center">
-          <span className="ml-[10px] text-md font-medium select-none text-gray-300">
+          <span className={`ml-[10px] text-md font-medium select-none text-gray-300 ${styles['v-anton']}`}>
             {statusText}
           </span>
         </div>
@@ -550,13 +562,13 @@ export default () => {
         <div className="bottom-0 w-full h-[5vh]"></div>
         <div className="flex-grow flex-shrink flex flex-col justify-evenly">
           <div className="flex justify-center">
-            <span className="text-gray-300 text-xl font-bold">MAPS</span>
+          <span className={`text-gray-300 text-3xl font-bold ${styles['v-anton']}`}>MAPS</span>
           </div>
           <div className="mb-2">
             <PickedMapRow></PickedMapRow>
           </div>
           <div className="flex justify-center">
-            <span className="text-gray-300 text-xl font-bold">BANS</span>
+            <span className={`text-gray-300 text-3xl font-bold ${styles['v-anton']}`}>BANS</span>
           </div>
           <div className="mb-2">
             <BannedMapRow></BannedMapRow>
@@ -564,58 +576,59 @@ export default () => {
         </div>
         <div className="bottom-0 w-full h-[5vh]  mt-6"></div>
       </div>
-      <div className="right-[10px] bottom-[70px] h-[10px] w-[10px] bg-red-400 fixed -z-10"></div>
-      <div className="right-[10px] bottom-[85px] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="right-[10px] bottom-[95px] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="right-[10px] bottom-[70px] h-[10px] w-[10px] bg-vred fixed -z-10"></div>
+      <div className="right-[10px] bottom-[85px] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="right-[10px] bottom-[95px] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
 
       <div className="left-[20vw] h-screen w-[1px] bg-gray-300 opacity-20 fixed -z-10"></div>
       <div className="top-[10vh] w-screen h-[1px] bg-gray-300 opacity-20 fixed -z-10"></div>
 
-      <div className="top-[52vh] left-[62vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[52vh] left-[calc(62vw+10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] left-[62vw] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[52vh] left-[calc(62vw+10px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="bottom-[36vh] left-[32.5vw] h-[6px] w-[30px] bg-red-400 fixed -z-10"></div>
+      <div className="bottom-[36vh] left-[32.5vw] h-[6px] w-[30px] bg-vred fixed -z-10"></div>
 
-      <div className="bottom-[36vh] right-[28vw] h-[4px] w-[30px] bg-red-400 fixed -z-10"></div>
-      <div className="bottom-[36vh] right-[calc(28vw-10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="bottom-[36vh] right-[calc(28vw-20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="bottom-[36vh] right-[28vw] h-[4px] w-[30px] bg-vred fixed -z-10"></div>
+      <div className="bottom-[36vh] right-[calc(28vw-10px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="bottom-[36vh] right-[calc(28vw-20px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
       
-      <div className="top-[37vh] left-[33vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[calc(37vh+10px)] left-[33vw] h-[40px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[37vh] left-[33vw] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[calc(37vh+10px)] left-[33vw] h-[40px] w-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="top-[27vh] left-[10px] h-[40px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[27vh] left-[10px] h-[40px] w-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="top-[10vh] right-[5vw] w-[60px] h-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[10vh] right-[5vw] w-[60px] h-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="top-[52vh] right-[3vw] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[52vh] right-[calc(3vw+10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[52vh] right-[calc(3vw+20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[52vh] right-[calc(3vw+30px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[52vh] right-[3vw] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+10px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+20px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[52vh] right-[calc(3vw+30px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="left-[calc(20vw-10px)] top-[55vh] w-[10px] h-[60px] bg-red-400 fixed -z-10"></div>
+      <div className="left-[calc(20vw-10px)] top-[55vh] w-[10px] h-[60px] bg-vred fixed -z-10"></div>
 
-      <div className="top-[10vh] left-[40vw] w-[4px] h-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="top-[10vh] left-[calc(40vw+10px)] w-[4px] h-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="top-[10vh] left-[40vw] w-[4px] h-[4px] bg-vred fixed -z-10"></div>
+      <div className="top-[10vh] left-[calc(40vw+10px)] w-[4px] h-[4px] bg-vred fixed -z-10"></div>
 
-      <div className="left-[10px] bottom-[28vh] h-[60px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="left-[10px] bottom-[calc(28vh-10px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
-      <div className="left-[10px] bottom-[calc(28vh-20px)] h-[4px] w-[4px] bg-red-400 fixed -z-10"></div>
+      <div className="left-[10px] bottom-[28vh] h-[60px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="left-[10px] bottom-[calc(28vh-10px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
+      <div className="left-[10px] bottom-[calc(28vh-20px)] h-[4px] w-[4px] bg-vred fixed -z-10"></div>
 
       <div className={`h-1/2 fixed -z-20 flex flex-nowrap justify-around ${styles['bg-text-upper']}`}>
-        <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
-        <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
       </div>
       <div className={`h-1/2 fixed bottom-0 -z-20 flex flex-nowrap justify-around ${styles['bg-text-lower']}`}>
-        <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
-        <span className={`text-[45vh] font-black leading-tight mx-[8vh] ${styles['bg-text']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
+        <span className={`text-[45vh] leading-tight mx-[8vh] ${styles['bg-text']} ${styles['v-anton']}`}>STREAMERCUP</span>
       </div>
-
-
     </div>
-    <div className="fixed bottom-0 w-full h-[5vh] bg-red-400 flex justify-center items-center">
-      <span className="text-md select-none">
+    <div className="fixed bottom-0 w-full h-[5vh] flex justify-end items-center">
+      <span className={`text-2xl text-vred select-none p-[10px] ${styles['v-anton']}`}>
         {lang.FOOTER}
       </span>
     </div>
+    <div className="fixed w-[100vw] bottom-0 left-0 z-10 shadow-[0_0_100vh_1vh_var(--vsky)]"></div>
   </>
 }
